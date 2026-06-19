@@ -6,6 +6,13 @@ het oog op de ILT-eisen: een beschreven inschrijf-/registratiesysteem, een
 certificatenregister per cursist, examens met een aparte examinator, en een
 onveranderbaar audit-spoor van alle wijzigingen.
 
+> Deze projectversie is gepusht naar `github.com/caribious/plaza-boat-dossier`
+> op branch `main`. De drie ISO-kwaliteits-PDF's staan in de Supabase bucket
+> `qms-documents` als:
+> - `KH-001.pdf`
+> - `onderbouwing-productie-8.pdf`
+> - `routekaart-iso-9001.pdf`
+
 ## Wat zit erin
 
 **Admin-omgeving** (voor administratie/instructeurs) — `/admin`
