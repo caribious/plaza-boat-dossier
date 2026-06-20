@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getProfile } from "@/lib/getProfile";
 import TopBar from "@/components/TopBar";
+import StudentNav from "@/components/StudentNav";
 import Footer from "@/components/Footer";
 
 export default async function StudentLayout({ children }: { children: React.ReactNode }) {
@@ -12,6 +13,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
   return (
     <>
       <TopBar name={profile.full_name || profile.email || ""} role={profile.role} />
+      <StudentNav />
       <div className="container">{children}</div>
       <Footer />
     </>
