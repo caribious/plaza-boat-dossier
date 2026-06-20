@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { progressBadge, examBadge, examKindLabel, fmtDate } from "@/lib/format";
+import { progressBadge, examBadge, examKindLabel, fmtDate, qualificationKindLabel, expiryBadge } from "@/lib/format";
 import { t } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -45,6 +45,23 @@ export default async function StudentPortal() {
     if (c.file_path) {
       const { data: s } = await supabase.storage.from("certificates").createSignedUrl(c.file_path, 3600);
       if (s?.signedUrl) signed[c.id] = s.signedUrl;
+    }
+  }
+
+  // Toelatingseisen & kwalificaties — RLS toont alleen de eigen rijen.
+  const { data: quals } = await supabase
+    .from("student_qualifications")
+    .select("id, kind, title, number, issuer, valid_until, verified, file_path")
+    .eq("student_id", student.id)
+    .order("kind");
+  const qualList = (quals as any[]) ?? [];
+  const qualSigned: Record<string, string> = {};
+  for (const q of qualList) {
+    if (q.file_path) {
+      const { data: s } = await supabase.storage
+        .from("student-qualifications")
+        .createSignedUrl(q.file_path, 3600);
+      if (s?.signedUrl) qualSigned[q.id] = s.signedUrl;
     }
   }
 
@@ -103,6 +120,49 @@ export default async function StudentPortal() {
             })}
           </tbody>
         </table>
+      </div>
+
+      <div className="card">
+        <h2>{T.sp_qual_title}</h2>
+        {qualList.length === 0 ? (
+          <p className="muted small">{T.qual_none}</p>
+        ) : (
+          <table>
+            <thead>
+              <tr><th>{T.qual_col_type}</th><th>{T.qual_col_number}</th><th>{T.qual_col_validuntil}</th><th>{T.qual_col_verified}</th><th>{T.qual_col_doc}</th></tr>
+            </thead>
+            <tbody>
+              {qualList.map((q) => {
+                const eb = expiryBadge(q.valid_until);
+                return (
+                  <tr key={q.id}>
+                    <td>
+                      {qualificationKindLabel(q.kind)}
+                      {q.title ? <div className="muted small">{q.title}</div> : null}
+                    </td>
+                    <td className="muted small">{q.number ?? "—"}</td>
+                    <td className="small">
+                      {fmtDate(q.valid_until)}{" "}
+                      <span className={`badge ${eb.cls}`}>{eb.label}</span>
+                    </td>
+                    <td>
+                      {q.verified
+                        ? <span className="badge ok">{T.qual_verified_yes}</span>
+                        : <span className="badge warn">{T.qual_verified_no}</span>}
+                    </td>
+                    <td>
+                      {qualSigned[q.id] ? (
+                        <a className="small" href={qualSigned[q.id]} target="_blank" rel="noreferrer">{T.q_download}</a>
+                      ) : (
+                        <span className="muted small">—</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
 
       <div className="card">

@@ -87,6 +87,60 @@ export function courseLabel(code: string | null) {
   return code;
 }
 
+// --- Toelatingseisen & kwalificaties --------------------------------
+// Vrije code (kind) -> nette weergave. VHF is de verplichte toelatingseis
+// (SCV Code X/6.1 — Reg 10.11).
+export function qualificationKindLabel(kind: string | null) {
+  const en = getLocale() === "en";
+  switch (kind) {
+    case "vhf":         return en ? "VHF certificate" : "VHF-certificaat";
+    case "medical":     return en ? "Medical certificate" : "Medisch certificaat";
+    case "first_aid":   return en ? "First aid" : "EHBO / First Aid";
+    case "gmdss_goc":   return "GMDSS / GOC";
+    case "sea_service": return en ? "Sea service" : "Vaartijd / seagoing service";
+    case "other":       return en ? "Other" : "Overig";
+    default:            return kind ?? "—";
+  }
+}
+
+// Aanbevolen keuzelijst voor de invoer (code + label). Taalbewust.
+export function qualificationKinds(): { value: string; label: string }[] {
+  const en = getLocale() === "en";
+  return [
+    { value: "vhf",         label: en ? "VHF certificate (SCV Code X/6.1 — Reg 10.11)" : "VHF-certificaat (SCV Code X/6.1 — Reg 10.11)" },
+    { value: "medical",     label: en ? "Medical certificate" : "Medisch certificaat" },
+    { value: "first_aid",   label: en ? "First aid" : "EHBO / First Aid" },
+    { value: "gmdss_goc",   label: "GMDSS / GOC" },
+    { value: "sea_service", label: en ? "Sea service" : "Vaartijd / seagoing service" },
+    { value: "other",       label: en ? "Other" : "Overig" },
+  ];
+}
+
+// Vervalsignalering: rood (verlopen) / oranje (binnen 60 dagen) / groen (geldig).
+// valid_until null => onbeperkt geldig (groen).
+export function expiryBadge(validUntil: string | null) {
+  const en = getLocale() === "en";
+  if (!validUntil) return { cls: "ok", label: en ? "Unlimited" : "Onbeperkt" };
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const end = new Date(validUntil);
+  const days = Math.ceil((end.getTime() - today.getTime()) / 86400000);
+  if (days < 0)  return { cls: "bad",  label: en ? "Expired" : "Verlopen" };
+  if (days <= 60) return { cls: "warn", label: en ? `Expires in ${days} days` : `Verloopt over ${days} dg` };
+  return { cls: "ok", label: en ? "Valid" : "Geldig" };
+}
+
+// Heeft de cursist een geldig (niet-verlopen) VHF-certificaat?
+export function hasValidVhf(quals: { kind: string; valid_until: string | null }[]) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return quals.some(
+    (q) =>
+      q.kind === "vhf" &&
+      (!q.valid_until || new Date(q.valid_until).getTime() >= today.getTime())
+  );
+}
+
 export function fmtDate(d: string | null) {
   if (!d) return "—";
   return new Date(d).toLocaleDateString(getLocale() === "en" ? "en-GB" : "nl-NL", {

@@ -84,6 +84,86 @@ export async function addCertificate(formData: FormData) {
   revalidatePath(`/admin/students/${studentId}`);
 }
 
+// ------------------------------------------------------------
+// Toelatingseisen & kwalificaties (VHF, medisch, EHBO, GMDSS/GOC, vaartijd)
+// RLS staat schrijven uitsluitend toe voor staff.
+// ------------------------------------------------------------
+
+// Kwalificatie toevoegen of bewerken. Leeg qualification_id = nieuw.
+export async function saveQualification(formData: FormData) {
+  const studentId = String(formData.get("student_id"));
+  const qualId = String(formData.get("qualification_id") || "");
+  const supabase = createClient();
+
+  const verified = formData.get("verified") === "on";
+  const row = {
+    student_id: studentId,
+    kind: String(formData.get("kind") || "other"),
+    title: String(formData.get("title") || "") || null,
+    number: String(formData.get("number") || "") || null,
+    issuer: String(formData.get("issuer") || "") || null,
+    issue_date: String(formData.get("issue_date") || "") || null,
+    valid_until: String(formData.get("valid_until") || "") || null,
+    verified,
+    verified_by: verified ? String(formData.get("verified_by") || "") || null : null,
+    verified_at: verified ? new Date().toISOString().slice(0, 10) : null,
+    notes: String(formData.get("notes") || "") || null,
+  };
+
+  if (qualId) {
+    await supabase.from("student_qualifications").update(row).eq("id", qualId);
+  } else {
+    await supabase.from("student_qualifications").insert(row);
+  }
+  revalidatePath(`/admin/students/${studentId}`);
+}
+
+// Kwalificatie verwijderen.
+export async function deleteQualification(formData: FormData) {
+  const studentId = String(formData.get("student_id"));
+  const qualId = String(formData.get("qualification_id"));
+  const supabase = createClient();
+
+  // Eventueel document opruimen (best effort).
+  const { data: q } = await supabase
+    .from("student_qualifications")
+    .select("file_path")
+    .eq("id", qualId)
+    .single();
+  if (q?.file_path) {
+    await supabase.storage.from("student-qualifications").remove([q.file_path]);
+  }
+  await supabase.from("student_qualifications").delete().eq("id", qualId);
+  revalidatePath(`/admin/students/${studentId}`);
+}
+
+// Document (PDF/afbeelding) uploaden bij een kwalificatie.
+export async function uploadQualificationFile(formData: FormData) {
+  const studentId = String(formData.get("student_id"));
+  const qualId = String(formData.get("qualification_id"));
+  const file = formData.get("file") as File | null;
+  if (!file || file.size === 0) {
+    revalidatePath(`/admin/students/${studentId}`);
+    return;
+  }
+
+  // Pad-conventie: <student_id>/<qualification_id>.<ext>
+  const ext = (file.name.split(".").pop() || "pdf").toLowerCase();
+  const path = `${studentId}/${qualId}.${ext}`;
+  const supabase = createClient();
+  const { error } = await supabase.storage
+    .from("student-qualifications")
+    .upload(path, file, { upsert: true, contentType: file.type || undefined });
+
+  if (!error) {
+    await supabase
+      .from("student_qualifications")
+      .update({ file_path: path })
+      .eq("id", qualId);
+  }
+  revalidatePath(`/admin/students/${studentId}`);
+}
+
 // PDF uploaden voor een bestaand certificaat (naar Supabase Storage).
 export async function uploadCertificateFile(formData: FormData) {
   const studentId = String(formData.get("student_id"));

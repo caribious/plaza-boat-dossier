@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/getProfile";
-import { progressBadge, examBadge, examKindLabel, fmtDate } from "@/lib/format";
+import { progressBadge, examBadge, examKindLabel, fmtDate, qualificationKindLabel, expiryBadge, hasValidVhf } from "@/lib/format";
 import PrintButton from "@/components/PrintButton";
 
 export const dynamic = "force-dynamic";
@@ -49,6 +49,14 @@ export default async function Report({ params }: { params: { id: string } }) {
     .from("certificates")
     .select("certificate_number, title, regulatory_reference, issued_date, expiry_date")
     .eq("student_id", params.id);
+
+  const { data: quals } = await supabase
+    .from("student_qualifications")
+    .select("id, kind, title, number, issuer, issue_date, valid_until, verified, verified_by")
+    .eq("student_id", params.id)
+    .order("kind");
+  const qualList = (quals as any[]) ?? [];
+  const vhfValid = hasValidVhf(qualList);
 
   const done = mods.filter((m) => m.status === "completed").length;
   const totalHours = mods.reduce((s, m) => s + Number(m.hours_logged || 0), 0);
@@ -136,6 +144,33 @@ export default async function Report({ params }: { params: { id: string } }) {
           ))}
         </tbody>
       </table>
+
+      <h3>Toelatingseisen &amp; kwalificaties</h3>
+      <p className="muted small" style={{ marginTop: -6 }}>
+        Verplichte toelatingseis VHF (SCV Code X/6.1 — Reg 10.11):{" "}
+        {vhfValid ? "geldig certificaat aanwezig." : "GEEN geldig VHF-certificaat vastgelegd."}
+      </p>
+      {qualList.length === 0 ? (
+        <p className="muted small">Nog geen toelatingseisen/kwalificaties vastgelegd.</p>
+      ) : (
+        <table>
+          <thead>
+            <tr><th>Type</th><th>Nummer</th><th>Uitgever</th><th>Afgegeven</th><th>Geldig t/m</th><th>Geverifieerd</th></tr>
+          </thead>
+          <tbody>
+            {qualList.map((q) => (
+              <tr key={q.id}>
+                <td>{qualificationKindLabel(q.kind)}{q.title ? ` — ${q.title}` : ""}</td>
+                <td className="muted small">{q.number ?? "—"}</td>
+                <td className="muted small">{q.issuer ?? "—"}</td>
+                <td className="muted small">{fmtDate(q.issue_date)}</td>
+                <td className="muted small">{fmtDate(q.valid_until)} · {expiryBadge(q.valid_until).label}</td>
+                <td className="muted small">{q.verified ? `Ja${q.verified_by ? ` (${q.verified_by})` : ""}` : "Nee"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       <h3>Certificatenregister</h3>
       {((certs as any[]) ?? []).length === 0 ? (

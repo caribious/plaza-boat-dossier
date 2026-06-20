@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { progressBadge, examBadge, examKindLabel, fmtDate } from "@/lib/format";
-import { updateModuleStatus, updateExamOutcome, addCertificate, uploadCertificateFile, updateStudent } from "./actions";
+import { progressBadge, examBadge, examKindLabel, fmtDate, qualificationKindLabel, expiryBadge, hasValidVhf, qualificationKinds } from "@/lib/format";
+import { updateModuleStatus, updateExamOutcome, addCertificate, uploadCertificateFile, updateStudent, saveQualification, deleteQualification, uploadQualificationFile } from "./actions";
 import { createStudentLogin } from "@/app/admin/account-actions";
 import CreateLogin from "@/components/CreateLogin";
 
@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function StudentDossier({ params }: { params: { id: string } }) {
   const supabase = createClient();
+  const QUALIFICATION_KINDS = qualificationKinds();
 
   const { data: student } = await supabase
     .from("students")
@@ -63,6 +64,24 @@ export default async function StudentDossier({ params }: { params: { id: string 
       if (s?.signedUrl) signed[c.id] = s.signedUrl;
     }
   }
+
+  // Toelatingseisen & kwalificaties (VHF, medisch, EHBO, GMDSS/GOC, vaartijd)
+  const { data: quals } = await supabase
+    .from("student_qualifications")
+    .select("id, kind, title, number, issuer, issue_date, valid_until, verified, verified_by, verified_at, file_path, notes")
+    .eq("student_id", params.id)
+    .order("kind");
+  const qualList = (quals as any[]) ?? [];
+  const qualSigned: Record<string, string> = {};
+  for (const q of qualList) {
+    if (q.file_path) {
+      const { data: s } = await supabase.storage
+        .from("student-qualifications")
+        .createSignedUrl(q.file_path, 3600);
+      if (s?.signedUrl) qualSigned[q.id] = s.signedUrl;
+    }
+  }
+  const vhfValid = hasValidVhf(qualList);
 
   const { data: audit } = await supabase
     .from("audit_log")
@@ -251,6 +270,153 @@ export default async function StudentDossier({ params }: { params: { id: string 
             })}
           </tbody>
         </table>
+      </div>
+
+      <div className="card">
+        <h2>Toelatingseisen &amp; kwalificaties</h2>
+        <p className="muted small" style={{ marginTop: -8 }}>
+          VHF, medisch certificaat, EHBO/First Aid, GMDSS/GOC en vaartijd.
+        </p>
+
+        {/* VHF is een VERPLICHTE toelatingseis (SCV Code X/6.1 — Reg 10.11) */}
+        {vhfValid ? (
+          <p className="badge ok" style={{ marginBottom: 12 }}>
+            Geldig VHF-certificaat aanwezig (SCV Code X/6.1 — Reg 10.11)
+          </p>
+        ) : (
+          <div
+            className="card"
+            style={{ borderColor: "#b3261e", background: "#fbe3e1", marginBottom: 12 }}
+          >
+            <strong style={{ color: "#b3261e" }}>Toelatingseis ontbreekt:</strong>{" "}
+            <span className="small">
+              Geen geldig VHF-certificaat vastgelegd (verplicht — SCV Code X/6.1,
+              Reg 10.11). Leg dit hieronder vast voordat de cursist wordt toegelaten.
+            </span>
+          </div>
+        )}
+
+        {qualList.length === 0 ? (
+          <p className="muted small">Nog geen toelatingseisen/kwalificaties vastgelegd.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Type</th><th>Nummer</th><th>Uitgever</th><th>Geldig t/m</th>
+                <th>Geverifieerd</th><th>Document</th><th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {qualList.map((q) => {
+                const eb = expiryBadge(q.valid_until);
+                return (
+                  <tr key={q.id}>
+                    <td>
+                      {qualificationKindLabel(q.kind)}
+                      {q.title ? <div className="muted small">{q.title}</div> : null}
+                    </td>
+                    <td className="muted small">{q.number ?? "—"}</td>
+                    <td className="muted small">{q.issuer ?? "—"}</td>
+                    <td className="small">
+                      {fmtDate(q.valid_until)}{" "}
+                      <span className={`badge ${eb.cls}`}>{eb.label}</span>
+                    </td>
+                    <td>
+                      {q.verified
+                        ? <span className="badge ok">Ja{q.verified_by ? ` · ${q.verified_by}` : ""}</span>
+                        : <span className="badge warn">Nee</span>}
+                    </td>
+                    <td>
+                      {qualSigned[q.id] ? (
+                        <a className="small" href={qualSigned[q.id]} target="_blank" rel="noreferrer">
+                          Bekijk
+                        </a>
+                      ) : (
+                        <form action={uploadQualificationFile} encType="multipart/form-data"
+                              style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                          <input type="hidden" name="student_id" value={student.id} />
+                          <input type="hidden" name="qualification_id" value={q.id} />
+                          <input type="file" name="file" accept="application/pdf,image/*" className="small" required />
+                          <button className="btn sm" type="submit">Upload</button>
+                        </form>
+                      )}
+                    </td>
+                    <td>
+                      <details>
+                        <summary className="small" style={{ cursor: "pointer", color: "var(--sea)" }}>
+                          Bewerk
+                        </summary>
+                        <form action={saveQualification}
+                              style={{ display: "grid", gap: 8, marginTop: 10, minWidth: 280 }}>
+                          <input type="hidden" name="student_id" value={student.id} />
+                          <input type="hidden" name="qualification_id" value={q.id} />
+                          <select name="kind" defaultValue={q.kind}>
+                            {QUALIFICATION_KINDS.map((k) => (
+                              <option key={k.value} value={k.value}>{k.label}</option>
+                            ))}
+                          </select>
+                          <input name="title" defaultValue={q.title ?? ""} placeholder="Omschrijving" />
+                          <input name="number" defaultValue={q.number ?? ""} placeholder="Nummer" />
+                          <input name="issuer" defaultValue={q.issuer ?? ""} placeholder="Uitgever" />
+                          <label className="small">Afgegeven
+                            <input name="issue_date" type="date" defaultValue={q.issue_date ?? ""} />
+                          </label>
+                          <label className="small">Geldig t/m
+                            <input name="valid_until" type="date" defaultValue={q.valid_until ?? ""} />
+                          </label>
+                          <input name="notes" defaultValue={q.notes ?? ""} placeholder="Notities" />
+                          <label className="small">
+                            <input type="checkbox" name="verified" defaultChecked={q.verified}
+                                   style={{ width: "auto", marginRight: 8 }} />
+                            Geverifieerd door staf
+                          </label>
+                          <input name="verified_by" defaultValue={q.verified_by ?? ""} placeholder="Geverifieerd door (naam)" />
+                          <div style={{ display: "flex", gap: 8 }}>
+                            <button className="btn sm" type="submit">Opslaan</button>
+                          </div>
+                        </form>
+                        <form action={deleteQualification} style={{ marginTop: 6 }}>
+                          <input type="hidden" name="student_id" value={student.id} />
+                          <input type="hidden" name="qualification_id" value={q.id} />
+                          <button className="btn ghost sm" type="submit">Verwijderen</button>
+                        </form>
+                      </details>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+
+        <details style={{ marginTop: 14 }}>
+          <summary className="small" style={{ cursor: "pointer", color: "var(--sea)" }}>
+            + Toelatingseis / kwalificatie toevoegen
+          </summary>
+          <form action={saveQualification}
+                style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 12, maxWidth: 560 }}>
+            <input type="hidden" name="student_id" value={student.id} />
+            <select name="kind" defaultValue="vhf">
+              {QUALIFICATION_KINDS.map((k) => (
+                <option key={k.value} value={k.value}>{k.label}</option>
+              ))}
+            </select>
+            <input name="title" placeholder="Omschrijving (bv. VHF/SRC)" />
+            <input name="number" placeholder="Certificaat-/registratienummer" />
+            <input name="issuer" placeholder="Uitgever (bv. Agentschap Telecom)" />
+            <input name="issue_date" type="date" title="Afgiftedatum" />
+            <input name="valid_until" type="date" title="Geldig t/m (leeg = onbeperkt)" />
+            <label className="small">
+              <input type="checkbox" name="verified" style={{ width: "auto", marginRight: 8 }} />
+              Geverifieerd door staf
+            </label>
+            <input name="verified_by" placeholder="Geverifieerd door (naam)" />
+            <input name="notes" placeholder="Notities" style={{ gridColumn: "1 / -1" }} />
+            <button className="btn" type="submit" style={{ gridColumn: "1 / -1", justifySelf: "start" }}>
+              Opslaan
+            </button>
+          </form>
+        </details>
       </div>
 
       <div className="card">
