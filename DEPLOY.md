@@ -87,6 +87,34 @@ Dit is nodig voor de "wachtwoord vergeten"- en uitnodigingslinks.
 
 ---
 
+## Deel 4 — Online cursus BM III (in-app e-learning)
+
+De BM III-cursus draait nu **in de app zelf** (readers, slides, quizzes, oefenexamen),
+naast de losse e-learning uit Deel 3. Eenmalige stappen:
+
+1. **Database**: `supabase/INSTALL.sql` bevat de e-learning al (migratie 0002,
+   `course-content`-bucket en de 183 BM III-vragen). Draaide je INSTALL.sql vóór deze
+   uitbreiding? Voer dan in de **SQL Editor** los uit, in deze volgorde:
+   1. `supabase/migrations/0002_elearning.sql`
+   2. `supabase/storage-elearning.sql`
+   3. `supabase/seed-elearning-bm3.sql`
+2. **Content uploaden** (PDF-readers + slide-decks naar de private bucket). Lokaal,
+   met `NEXT_PUBLIC_SUPABASE_URL` en `SUPABASE_SERVICE_ROLE_KEY` in `.env.local`:
+   ```bash
+   node scripts/upload-content.mjs
+   ```
+   Dit zet `content/bm3/readers/*.pdf` en `content/bm3/decks/*.pdf` in
+   `course-content/bm3/...`. De `content/`-map staat in `.gitignore` (grote binaries).
+3. Een ingelogde cursist gaat naar **Mijn cursus** in de bovenbalk. Voortgang,
+   quizscores en het oefenexamen-resultaat verschijnen automatisch in zijn dossier
+   (en daarmee voor admin/ILT).
+
+> Vragenbank gewijzigd in de e-learning (`data.js`)? Genereer de seed opnieuw:
+> `node scripts/gen-seed-bm3.mjs "/pad/naar/data.js"` en draai de nieuwe
+> `seed-elearning-bm3.sql` (idempotent: `on conflict do update`).
+
+---
+
 ## Klaar — controle
 
 - Open je Vercel-URL → log in (demo: `admin@plazaboatcollege.test` / `Password123!`).
