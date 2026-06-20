@@ -6,3 +6,7 @@
 *.log
 .DS_Store
 next-env.d.ts
+
+# Cursuscontent (grote PDF-binaries) — niet committen; via scripts/upload-content.mjs
+/content
+/supabase/.temp
