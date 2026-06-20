@@ -30,6 +30,8 @@ export default async function IltQuality() {
       <p className="page-sub">{T.ilq_sub}</p>
       <p className="small" style={{ marginTop: -6 }}>
         <Link href="/ilt/quality/registers">{T.q_to_registers}</Link>
+        {" · "}
+        <Link href="/ilt/quality/registers/risks">{T.q_to_risks}</Link>
       </p>
 
       <div className="card">

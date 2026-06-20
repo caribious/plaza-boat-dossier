@@ -97,6 +97,12 @@ td a { font-weight: 600; }
 .badge.ok   { background: var(--ok-bg);   color: var(--ok); }
 .badge.warn { background: var(--warn-bg); color: var(--warn); }
 .badge.idle { background: var(--idle-bg); color: var(--idle); }
+.badge.bad  { background: #fbe3e1; color: #b3261e; }
+
+/* KPI-kaart met statuskleur (links-balk) */
+.kpi.kpi-ok   { border-left-color: var(--ok); }
+.kpi.kpi-warn { border-left-color: var(--warn); }
+.kpi.kpi-bad  { border-left-color: #b3261e; }
 
 .progress-wrap { background: var(--idle-bg); border-radius: 999px; height: 10px; overflow: hidden; }
 .progress-bar { background: var(--sea); height: 100%; border-radius: 999px; }

@@ -11,6 +11,7 @@ export default function IltNav() {
       <Link href="/ilt/content">{T.iln_content}</Link>
       <Link href="/ilt/quality">{T.nav_quality}</Link>
       <Link href="/ilt/quality/registers">{T.nav_registers}</Link>
+      <Link href="/ilt/quality/registers/risks">{T.nav_risks}</Link>
       <Link href="/ilt/quality/satisfaction">{T.nav_satisfaction}</Link>
       <Link href="/ilt/audit">{T.iln_audit}</Link>
       <Link href="/ilt/export">{T.iln_export}</Link>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { fmtDate, qmsStatusBadge, incidentKindLabel, severityLabel, improvementTypeLabel, courseLabel } from "@/lib/format";
 import { t } from "@/lib/i18n";
@@ -20,6 +21,9 @@ export default async function IltQmsRegisters() {
     <>
       <h1 className="page-title">{T.ilr_title}</h1>
       <p className="page-sub">{T.ilr_sub}</p>
+      <p className="small" style={{ marginTop: -6 }}>
+        <Link href="/ilt/quality/registers/risks">{T.ilr_to_risks}</Link>
+      </p>
 
       <div className="card">
         <h2>{T.rg_incidents} ({incidents.length})</h2>

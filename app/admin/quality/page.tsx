@@ -35,7 +35,11 @@ export default async function QualityPage() {
       <h1 className="page-title">{T.q_title}</h1>
       <p className="page-sub">{T.q_sub}</p>
       <p className="small" style={{ marginTop: -6 }}>
-        <Link href="/admin/quality/registers">{T.q_to_registers}</Link>
+        <Link href="/admin/quality/kpi">{T.q_to_kpi}</Link>
+        {" · "}
+        <Link href="/admin/quality/registers">{T.q_to_registers_short}</Link>
+        {" · "}
+        <Link href="/admin/quality/registers/risks">{T.q_to_risks}</Link>
       </p>
 
       <div className="card">

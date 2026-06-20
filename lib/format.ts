@@ -52,6 +52,36 @@ export function improvementTypeLabel(t: string | null) {
   return "—";
 }
 
+// --- Risicoregister (ISO 9001 §6.1) ---------------------------------
+// Risicoscore = waarschijnlijkheid (1..5) x impact (1..5) = 1..25.
+// Kleur: laag (<=4) groen, middel (5..9) oranje, hoog (>=10) rood.
+export function riskScoreBadge(score: number | null) {
+  const s = Number(score ?? 0);
+  if (s <= 0) return { cls: "idle", label: "—" };
+  if (s >= 10) return { cls: "bad", label: String(s) };
+  if (s >= 5) return { cls: "warn", label: String(s) };
+  return { cls: "ok", label: String(s) };
+}
+
+export function riskResponseLabel(r: string | null) {
+  const en = getLocale() === "en";
+  if (r === "vermijden") return en ? "Avoid" : "Vermijden";
+  if (r === "beperken") return en ? "Mitigate" : "Beperken";
+  if (r === "delen") return en ? "Share" : "Delen";
+  if (r === "accepteren") return en ? "Accept" : "Accepteren";
+  return "—";
+}
+
+// KPI-status t.o.v. target: 'ok' (groen) / 'warn' (oranje) / 'bad' (rood).
+export function kpiStatusBadge(status: "ok" | "warn" | "bad" | "idle") {
+  const en = getLocale() === "en";
+  if (status === "ok") return { cls: "ok", label: en ? "On track" : "Op koers" };
+  if (status === "warn") return { cls: "warn", label: en ? "Attention" : "Aandacht" };
+  if (status === "bad") return { cls: "bad", label: en ? "Below target" : "Onder norm" };
+  return { cls: "idle", label: "—" };
+}
+
+// Opleidingscode -> nette weergave (null = n.v.t.)
 export function courseLabel(code: string | null) {
   if (!code) return getLocale() === "en" ? "n/a" : "n.v.t.";
   return code;
