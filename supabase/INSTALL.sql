@@ -401,21 +401,20 @@ insert into modules (course_id, sequence, code, title, required_hours, is_practi
 select c.id, v.seq, 'M' || lpad(v.seq::text, 2, '0'), v.title, v.hours, v.practical
 from courses c
 join (values
-  -- BM I (modulestructuur; content in ontwikkeling)
+  -- BM I (13 modules — gelijk aan e-learning data.js / readers BMI)
   ('BM-I',  1,'Introduction & Grade 1 Scope',                4.0, false),
-  ('BM-I',  2,'Legislation & Operational Requirements',      4.0, false),
-  ('BM-I',  3,'Chartwork, Position Fixing & Voyage Planning',6.0, false),
+  ('BM-I',  2,'Legislation, Operational Requirements & SMS', 4.0, false),
+  ('BM-I',  3,'Chartwork, Navigation & Passage Planning',    6.0, false),
   ('BM-I',  4,'COLREG (Full Knowledge)',                     6.0, false),
-  ('BM-I',  5,'Seamanship & Boat Handling (12-24 m)',        8.0, true),
-  ('BM-I',  6,'Engineering',                                 4.0, false),
-  ('BM-I',  7,'Passenger Safety & Emergencies',              4.0, false),
-  ('BM-I',  8,'MARPOL',                                      4.0, false),
-  ('BM-I',  9,'Fire Fighting',                               8.0, true),
-  ('BM-I', 10,'Sea Survival',                                8.0, true),
-  ('BM-I', 11,'Buoyage & Electronic Navigation',            4.0, false),
-  ('BM-I', 12,'Vessel Construction & Stability',            4.0, false),
-  ('BM-I', 13,'GMDSS',                                       4.0, false),
-  ('BM-I', 14,'Elementary First Aid',                        8.0, true),
+  ('BM-I',  5,'Seamanship 1',                                6.0, true),
+  ('BM-I',  6,'Seamanship 2 & Boat Handling (12–24 m)',      8.0, true),
+  ('BM-I',  7,'Engineering',                                 4.0, false),
+  ('BM-I',  8,'Passenger Safety, Emergencies & SAR',         4.0, false),
+  ('BM-I',  9,'MARPOL & Dangerous Goods',                    4.0, false),
+  ('BM-I', 10,'Fire Fighting',                               8.0, true),
+  ('BM-I', 11,'Sea Survival & GMDSS',                        8.0, true),
+  ('BM-I', 12,'Elementary First Aid',                        8.0, true),
+  ('BM-I', 13,'Vessel Construction, Stability & Buoyage',    4.0, false),
   -- BM II (volledig gevuld)
   ('BM-II', 1,'Introduction & Grade 2 Scope',               4.0, false),
   ('BM-II', 2,'Legislation, Operational Requirements & SMS', 4.0, false),
