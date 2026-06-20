@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { fmtDate } from "@/lib/format";
 import { updateClause, addDocument, uploadDocFile } from "./actions";
@@ -32,6 +33,9 @@ export default async function QualityPage() {
       <p className="page-sub">
         Kwaliteitshandboek (KH-001) als werkend naslagdocument, met de documentenbibliotheek
         voor audits. Volgt de NEN-EN-ISO 9001:2015-structuur.
+      </p>
+      <p className="small" style={{ marginTop: -6 }}>
+        <Link href="/admin/quality/registers">→ Naar de QMS-registers (incidenten, klachten, verbeteringen)</Link>
       </p>
 
       <div className="card">

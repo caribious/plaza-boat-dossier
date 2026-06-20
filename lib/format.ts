@@ -19,6 +19,39 @@ export function examKindLabel(kind: string) {
   return kind;
 }
 
+// --- QMS-registers (ISO 9001) ---------------------------------------
+export function qmsStatusBadge(status: string | null) {
+  if (status === "gesloten") return { cls: "ok", label: "Gesloten" };
+  if (status === "in_behandeling") return { cls: "warn", label: "In behandeling" };
+  return { cls: "idle", label: "Open" };
+}
+
+export function incidentKindLabel(kind: string | null) {
+  if (kind === "ongeval") return "Ongeval";
+  if (kind === "bijna_ongeval") return "Bijna-ongeval";
+  return kind ?? "—";
+}
+
+export function severityLabel(s: string | null) {
+  if (s === "laag") return "Laag";
+  if (s === "middel") return "Middel";
+  if (s === "hoog") return "Hoog";
+  return "—";
+}
+
+export function improvementTypeLabel(t: string | null) {
+  if (t === "correctief") return "Correctief";
+  if (t === "preventief") return "Preventief";
+  if (t === "verbetering") return "Verbetering";
+  return "—";
+}
+
+// Opleidingscode -> nette weergave (null = n.v.t.)
+export function courseLabel(code: string | null) {
+  if (!code) return "n.v.t.";
+  return code;
+}
+
 export function fmtDate(d: string | null) {
   if (!d) return "—";
   return new Date(d).toLocaleDateString("nl-NL", {

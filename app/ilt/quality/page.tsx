@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { fmtDate } from "@/lib/format";
 
@@ -28,6 +29,9 @@ export default async function IltQuality() {
       <h1 className="page-title">Kwaliteit — ISO 9001</h1>
       <p className="page-sub">
         Kwaliteitshandboek (KH-001) en kwaliteitsdocumenten (alleen-lezen). Conform NEN-EN-ISO 9001:2015.
+      </p>
+      <p className="small" style={{ marginTop: -6 }}>
+        <Link href="/ilt/quality/registers">→ Naar de QMS-registers (incidenten, klachten, verbeteringen)</Link>
       </p>
 
       <div className="card">

@@ -8,6 +8,7 @@ export default function IltNav() {
       <Link href="/ilt/instructors">Instructeurs</Link>
       <Link href="/ilt/content">Lesprogramma</Link>
       <Link href="/ilt/quality">Kwaliteit</Link>
+      <Link href="/ilt/quality/registers">QMS-registers</Link>
       <Link href="/ilt/audit">Audit-log</Link>
       <Link href="/ilt/export">Inspectierapport</Link>
     </nav>

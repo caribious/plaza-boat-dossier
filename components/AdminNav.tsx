@@ -6,6 +6,7 @@ export default function AdminNav() {
       <Link href="/admin">Cursisten</Link>
       <Link href="/admin/instructors">Instructeurs</Link>
       <Link href="/admin/quality">Kwaliteit</Link>
+      <Link href="/admin/quality/registers">QMS-registers</Link>
     </nav>
   );
 }
