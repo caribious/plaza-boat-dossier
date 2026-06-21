@@ -8,7 +8,7 @@ import {
   ModuleRow,
   QuestionRow,
 } from "@/lib/learn";
-import ModuleTabs from "./ModuleTabs";
+import ModuleTabs from "@/components/ModuleTabs";
 
 export const dynamic = "force-dynamic";
 

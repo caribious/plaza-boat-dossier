@@ -1,4 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
+import { normCode } from "@/lib/learn";
 import { t } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -42,7 +44,7 @@ export default async function AdminContent() {
                 ) : mods.map((m: any) => (
                   <tr key={m.code ?? m.sequence}>
                     <td className="muted small">{m.code ?? m.sequence}</td>
-                    <td>{m.title}</td>
+                    <td><Link href={`/admin/content/${normCode(c.code)}/${m.sequence}`}>{m.title}</Link></td>
                     <td className="muted small">{m.required_hours}</td>
                     <td className="muted small">{m.is_practical ? T.ilc_practical : T.ilc_theory}</td>
                   </tr>

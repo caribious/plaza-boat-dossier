@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { QuestionRow } from "@/lib/learn";
-import { recordModuleQuiz } from "../../actions";
+import { recordModuleQuiz } from "@/app/student/learn/actions";
 
 type Tab = "reader" | "slides" | "quiz";
 
@@ -13,12 +13,14 @@ export default function ModuleTabs({
   readerUrl,
   deckUrl,
   questions,
+  preview = false,
 }: {
   courseCode: string;
   moduleSeq: number;
   readerUrl: string | null;
   deckUrl: string | null;
   questions: QuestionRow[];
+  preview?: boolean;
 }) {
   const [tab, setTab] = useState<Tab>("reader");
 
@@ -48,7 +50,7 @@ export default function ModuleTabs({
       {tab === "reader" && <PdfFrame url={readerUrl} label="reader" />}
       {tab === "slides" && <PdfFrame url={deckUrl} label="slides" />}
       {tab === "quiz" && (
-        <Quiz courseCode={courseCode} moduleSeq={moduleSeq} questions={questions} />
+        <Quiz courseCode={courseCode} moduleSeq={moduleSeq} questions={questions} preview={preview} />
       )}
     </div>
   );
@@ -86,10 +88,12 @@ function Quiz({
   courseCode,
   moduleSeq,
   questions,
+  preview = false,
 }: {
   courseCode: string;
   moduleSeq: number;
   questions: QuestionRow[];
+  preview?: boolean;
 }) {
   const router = useRouter();
   const [answers, setAnswers] = useState<AnswerState[]>(
@@ -230,14 +234,16 @@ function Quiz({
           <button className="btn ghost sm" onClick={reset} type="button">
             Opnieuw proberen
           </button>
-          <button
-            className="btn sm"
-            type="button"
-            disabled={saving || !allAnswered}
-            onClick={completeModule}
-          >
-            {saving ? "Opslaan…" : "Module afronden"}
-          </button>
+          {!preview && (
+            <button
+              className="btn sm"
+              type="button"
+              disabled={saving || !allAnswered}
+              onClick={completeModule}
+            >
+              {saving ? "Opslaan…" : "Module afronden"}
+            </button>
+          )}
         </div>
         {saveMsg && <p className="quiz-savemsg muted small">{saveMsg}</p>}
       </div>
