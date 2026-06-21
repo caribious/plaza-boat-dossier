@@ -12,6 +12,9 @@ export default async function IltQuality() {
   const { data: docs } = await supabase
     .from("qms_documents").select("id, clause_number, title, doc_type, reference, file_path").order("created_at");
 
+  const { data: sigData } = await supabase
+    .from("qms_document_signatures").select("document_id, signer_name, signer_role, signed_at");
+  const sigs = (sigData as any[]) ?? [];
   const docList = (docs as any[]) ?? [];
   const signed: Record<string, string> = {};
   for (const d of docList) {
@@ -32,19 +35,21 @@ export default async function IltQuality() {
       <div className="card">
         <h2>{T.ilq_docs}</h2>
         <table>
-          <thead><tr><th>{T.q_doc}</th><th>{T.q_doctype}</th><th>{T.q_docref}</th><th>{T.q_chapter}</th><th>{T.q_pdf}</th></tr></thead>
+          <thead><tr><th>{T.q_doc}</th><th>{T.q_doctype}</th><th>{T.q_docref}</th><th>{T.q_pdf}</th><th>{T.rv_signatures}</th></tr></thead>
           <tbody>
             {docList.length === 0 ? (
               <tr><td colSpan={5} className="muted small">{T.ilq_no_docs}</td></tr>
-            ) : docList.map((d) => (
+            ) : docList.map((d) => {
+              const dsigs = sigs.filter((x) => x.document_id === d.id);
+              return (
               <tr key={d.id}>
-                <td>{d.title}</td>
+                <td>{d.title}{d.clause_number ? <span className="muted small"> · §{d.clause_number}</span> : null}</td>
                 <td className="muted small">{d.doc_type ?? "—"}</td>
                 <td className="muted small">{d.reference ?? "—"}</td>
-                <td className="muted small">{d.clause_number ?? "—"}</td>
                 <td>{signed[d.id] ? <a className="small" href={signed[d.id]} target="_blank" rel="noreferrer">{T.q_download}</a> : <span className="muted small">—</span>}</td>
+                <td className="small">{dsigs.length === 0 ? <span className="muted small">{T.rv_no_sign}</span> : dsigs.map((s: any, i: number) => (<div key={i}><span className="badge ok">✓</span> {s.signer_name}{s.signer_role ? <span className="muted"> · {s.signer_role}</span> : null}</div>))}</td>
               </tr>
-            ))}
+            );})}
           </tbody>
         </table>
       </div>

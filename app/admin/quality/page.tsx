@@ -1,23 +1,27 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { fmtDate } from "@/lib/format";
 import { t } from "@/lib/i18n";
-import { updateClause, addDocument, uploadDocFile } from "./actions";
+import { updateClause, addDocument, uploadDocFile, signDocument } from "./actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function QualityPage() {
   const T = t();
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
   const { data: clauses } = await supabase
-    .from("qms_clauses")
-    .select("id, clause_number, title, pbc_approach, updated_at")
-    .order("sort_order");
+    .from("qms_clauses").select("id, clause_number, title, pbc_approach, updated_at").order("sort_order");
   const { data: docs } = await supabase
-    .from("qms_documents")
-    .select("id, clause_number, title, doc_type, reference, file_path, created_at")
-    .order("created_at");
+    .from("qms_documents").select("id, clause_number, title, doc_type, reference, file_path, created_at").order("created_at");
+  const { data: sigData } = await supabase
+    .from("qms_document_signatures").select("document_id, signer_profile_id, signer_name, signer_role, signed_at");
 
   const docList = (docs as any[]) ?? [];
+  const sigs = (sigData as any[]) ?? [];
+  const sigsFor = (id: string) => sigs.filter((s) => s.document_id === id);
+  const iSigned = (id: string) => sigs.some((s) => s.document_id === id && s.signer_profile_id === user?.id);
+
   const signed: Record<string, string> = {};
   for (const d of docList) {
     if (d.file_path) {
@@ -58,20 +62,21 @@ export default async function QualityPage() {
 
       <div className="card">
         <h2>{T.q_lib}</h2>
-        <p className="muted small" style={{ marginTop: -8 }}>{T.q_lib_sub}</p>
+        <p className="muted small" style={{ marginTop: -8 }}>{T.q_lib_sub} {T.rv_sign_note}</p>
         <table>
           <thead>
-            <tr><th>{T.q_doc}</th><th>{T.q_doctype}</th><th>{T.q_docref}</th><th>{T.q_chapter}</th><th>{T.q_pdf}</th></tr>
+            <tr><th>{T.q_doc}</th><th>{T.q_doctype}</th><th>{T.q_docref}</th><th>{T.q_pdf}</th><th>{T.rv_signatures}</th><th></th></tr>
           </thead>
           <tbody>
             {docList.length === 0 ? (
-              <tr><td colSpan={5} className="muted small">{T.q_no_docs}</td></tr>
-            ) : docList.map((d) => (
+              <tr><td colSpan={6} className="muted small">{T.q_no_docs}</td></tr>
+            ) : docList.map((d) => {
+              const dsigs = sigsFor(d.id);
+              return (
               <tr key={d.id}>
-                <td>{d.title}</td>
+                <td>{d.title}{d.clause_number ? <span className="muted small"> · §{d.clause_number}</span> : null}</td>
                 <td className="muted small">{d.doc_type ?? "—"}</td>
                 <td className="muted small">{d.reference ?? "—"}</td>
-                <td className="muted small">{d.clause_number ?? "—"}</td>
                 <td>
                   {signed[d.id] ? (
                     <a className="small" href={signed[d.id]} target="_blank" rel="noreferrer">{T.q_download}</a>
@@ -83,8 +88,24 @@ export default async function QualityPage() {
                     </form>
                   )}
                 </td>
+                <td className="small">
+                  {dsigs.length === 0 ? <span className="muted small">{T.rv_no_sign}</span> :
+                    dsigs.map((s, i) => (
+                      <div key={i}><span className="badge ok">✓</span> {s.signer_name}
+                        {s.signer_role ? <span className="muted"> · {s.signer_role}</span> : null}
+                        <span className="muted"> · {fmtDate(s.signed_at)}</span></div>
+                    ))}
+                </td>
+                <td>
+                  {iSigned(d.id) ? <span className="badge ok">{T.rv_you_signed}</span> : (
+                    <form action={signDocument}>
+                      <input type="hidden" name="document_id" value={d.id} />
+                      <button className="btn sm" type="submit">{T.rv_signoff}</button>
+                    </form>
+                  )}
+                </td>
               </tr>
-            ))}
+            );})}
           </tbody>
         </table>
 
