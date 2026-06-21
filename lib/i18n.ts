@@ -241,6 +241,11 @@ const nl = {
     us_pw_set: "Wachtwoord (leeg = automatisch)",
     us_created: "Account aangemaakt. Geef deze gegevens door aan de persoon:", us_temp_pw: "Tijdelijk wachtwoord",
     us_change_hint: "Vraag de persoon het wachtwoord na de eerste keer inloggen te wijzigen (via Account).",
+    q_to_syllabus: "Syllabusmatrix",
+    sm_title: "Syllabus-dekkingsmatrix", sm_sub: "Per SCV-/Annex 11-bronverwijzing: in welke module en waar (reader, slides, quiz) de eis in de lesstof wordt behandeld. Automatisch afgeleid uit de vragenbank en het lesmateriaal.",
+    sm_req: "Eis (bron)", sm_modules: "Module(s)", sm_reader: "Reader", sm_slides: "Slides", sm_quiz: "Quiz",
+    sm_refs: "eisen (bronnen)", sm_none: "Geen bronverwijzingen gevonden voor deze opleiding.",
+    sm_note: "Dekking afgeleid uit echte data: quiz = aantal vragen met deze bron; reader/slides = beschikbaar in de betreffende module. Niets verzonnen — een leeg vakje betekent dat dekking nog niet aantoonbaar is.",
 } as const;
 
 type Keys = keyof typeof nl;
@@ -464,6 +469,11 @@ const en: Record<Keys, string> = {
     us_pw_set: "Password (empty = automatic)",
     us_created: "Account created. Share these details with the person:", us_temp_pw: "Temporary password",
     us_change_hint: "Ask the person to change the password after first login (via Account).",
+    q_to_syllabus: "Syllabus matrix",
+    sm_title: "Syllabus coverage matrix", sm_sub: "Per SCV/Annex 11 reference: in which module and where (reader, slides, quiz) the requirement is covered in the material. Automatically derived from the question bank and course material.",
+    sm_req: "Requirement (ref)", sm_modules: "Module(s)", sm_reader: "Reader", sm_slides: "Slides", sm_quiz: "Quiz",
+    sm_refs: "requirements (refs)", sm_none: "No references found for this course.",
+    sm_note: "Coverage derived from real data: quiz = number of questions with this reference; reader/slides = available in the relevant module. Nothing fabricated — an empty box means coverage is not yet demonstrable.",
 };
 
 const DICT = { nl, en };

@@ -40,6 +40,8 @@ export default async function QualityPage() {
         <Link href="/admin/quality/registers">{T.q_to_registers_short}</Link>
         {" · "}
         <Link href="/admin/quality/registers/risks">{T.q_to_risks}</Link>
+        {" · "}
+        <Link href="/admin/quality/syllabus">{T.q_to_syllabus}</Link>
       </p>
 
       <div className="card">
