@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/getProfile";
 import { t } from "@/lib/i18n";
 import InviteUser from "@/components/InviteUser";
+import CreateUserPw from "@/components/CreateUserPw";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,11 @@ export default async function UsersPage() {
         <h2>{T.us_invite}</h2>
         <InviteUser labels={labels} />
         <p className="small muted" style={{ marginTop: 10 }}>{T.us_note}</p>
+      </div>
+
+      <div className="card">
+        <h2>{T.us_create_pw}</h2>
+        <CreateUserPw labels={labels} />
       </div>
 
       <div className="card">
