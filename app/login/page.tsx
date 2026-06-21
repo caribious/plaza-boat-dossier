@@ -55,15 +55,7 @@ export default function LoginPage() {
         <p className="small" style={{ marginTop: 14 }}>
           <a href="/forgot-password">Wachtwoord vergeten?</a>
         </p>
-        <div className="login-demo">
-          <strong>Demo-accounts</strong>
-          <br />
-          Admin: admin@plazaboatcollege.test
-          <br />
-          Student: student@plazaboatcollege.test
-          <br />
-          Wachtwoord: Password123!
-        </div>
+        {/* demo-accounts verwijderd vóór productie/inspectie */}
       </div>
     </div>
   );
