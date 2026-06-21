@@ -159,6 +159,12 @@ const nl = {
     sat_respondents: "Respondenten", sat_avg: "Gem. score", sat_comments: "Opmerkingen",
     sat_none: "Nog geen metingen vastgelegd.", sat_overall: "Gemiddelde (alle metingen)",
     sat_target: "Streefwaarde D5", sat_score_ph: "Gem. score (1,0–5,0)", sat_readonly: "Tevredenheidsmetingen (alleen-lezen).",
+    nav_users: "Gebruikers",
+    us_title: "Gebruikers & toegang", us_sub: "Nodig directie, instructeurs of inspecteurs uit. Ze krijgen een e-mail en kiezen hun eigen wachtwoord.",
+    us_invite: "Gebruiker uitnodigen", us_name: "Volledige naam", us_email: "E-mail", us_role: "Rol",
+    us_send: "Uitnodiging sturen", us_sent: "Uitnodiging verstuurd naar", us_existing: "Bestaande accounts",
+    us_admin_only: "Deze pagina is alleen voor beheerders.", us_none: "Nog geen accounts.",
+    us_note: "Werkt zodra e-mail (SMTP) is ingesteld in Supabase Authentication en de site-URL is toegestaan.",
 } as const;
 
 type Keys = keyof typeof nl;
@@ -303,6 +309,12 @@ const en: Record<Keys, string> = {
     sat_respondents: "Respondents", sat_avg: "Avg. score", sat_comments: "Comments",
     sat_none: "No surveys recorded yet.", sat_overall: "Average (all surveys)",
     sat_target: "Target D5", sat_score_ph: "Avg. score (1.0–5.0)", sat_readonly: "Satisfaction surveys (read-only).",
+    nav_users: "Users",
+    us_title: "Users & access", us_sub: "Invite directors, instructors or inspectors. They receive an email and choose their own password.",
+    us_invite: "Invite user", us_name: "Full name", us_email: "Email", us_role: "Role",
+    us_send: "Send invite", us_sent: "Invite sent to", us_existing: "Existing accounts",
+    us_admin_only: "This page is for admins only.", us_none: "No accounts yet.",
+    us_note: "Works once email (SMTP) is configured in Supabase Authentication and the site URL is allowed.",
 };
 
 const DICT = { nl, en };

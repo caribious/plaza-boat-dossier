@@ -12,6 +12,7 @@ export default function AdminNav() {
       <Link href="/admin/quality/agenda">{T.nav_agenda}</Link>
       <Link href="/admin/quality/reviews">{T.nav_reviews}</Link>
       <Link href="/admin/quality/satisfaction">{T.nav_satisfaction}</Link>
+      <Link href="/admin/users">{T.nav_users}</Link>
     </nav>
   );
 }
