@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { fmtDate } from "@/lib/format";
+import { t } from "@/lib/i18n";
 import { updateClause, addDocument, uploadDocFile } from "./actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function QualityPage() {
+  const T = t();
   const supabase = createClient();
   const { data: clauses } = await supabase
     .from("qms_clauses")
@@ -20,64 +21,51 @@ export default async function QualityPage() {
   const signed: Record<string, string> = {};
   for (const d of docList) {
     if (d.file_path) {
-      const { data: s } = await supabase.storage
-        .from("qms-documents")
-        .createSignedUrl(d.file_path, 3600);
+      const { data: s } = await supabase.storage.from("qms-documents").createSignedUrl(d.file_path, 3600);
       if (s?.signedUrl) signed[d.id] = s.signedUrl;
     }
   }
 
   return (
     <>
-      <h1 className="page-title">Kwaliteit — ISO 9001</h1>
-      <p className="page-sub">
-        Kwaliteitshandboek (KH-001) als werkend naslagdocument, met de documentenbibliotheek
-        voor audits. Volgt de NEN-EN-ISO 9001:2015-structuur.
-      </p>
+      <h1 className="page-title">{T.q_title}</h1>
+      <p className="page-sub">{T.q_sub}</p>
       <p className="small" style={{ marginTop: -6 }}>
-        <Link href="/admin/quality/registers">→ Naar de QMS-registers (incidenten, klachten, verbeteringen)</Link>
+        <Link href="/admin/quality/registers">{T.q_to_registers}</Link>
       </p>
 
       <div className="card">
-        <h2>Zo werkt het</h2>
-        <p className="muted small" style={{ marginTop: -8 }}>
-          De app is je dashboard, register en herinneringssysteem. Documenten opstellen en
-          ondertekenen gebeurt eromheen; de getekende PDF&apos;s upload je hier als bewijs.
-        </p>
+        <h2>{T.q_how_title}</h2>
+        <p className="muted small" style={{ marginTop: -8 }}>{T.q_how_intro}</p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           <div>
-            <span className="flabel">In de app</span>
+            <span className="flabel">{T.q_in_app}</span>
             <ul className="small" style={{ margin: "6px 0 0", paddingLeft: 18 }}>
-              <li>Registreren: <Link href="/admin/quality/registers">incidenten, klachten, CAPA, risico&apos;s</Link></li>
-              <li>Herinneringen op de <Link href="/admin/quality/agenda">QMS-agenda</Link></li>
-              <li>Audit &amp; directiebeoordeling plannen en afvinken bij <Link href="/admin/quality/reviews">Audit &amp; beoordeling</Link></li>
-              <li>Certificaten en documenten uploaden (hieronder en bij Instructeurs)</li>
+              <li>{T.q_app_1a}<Link href="/admin/quality/registers">{T.q_app_1b}</Link></li>
+              <li>{T.q_app_2a}<Link href="/admin/quality/agenda">{T.q_app_2b}</Link></li>
+              <li>{T.q_app_3a}<Link href="/admin/quality/reviews">{T.q_app_3b}</Link></li>
+              <li>{T.q_app_4}</li>
             </ul>
           </div>
           <div>
-            <span className="flabel">Eromheen (daarna hier uploaden)</span>
+            <span className="flabel">{T.q_around}</span>
             <ul className="small" style={{ margin: "6px 0 0", paddingLeft: 18 }}>
-              <li>Handboek, procedures (PR-01 t/m PR-09) en formulieren opstellen/ondertekenen</li>
-              <li>De interne audit en de directiebeoordeling daadwerkelijk houden</li>
-              <li>Getekende IA-01 / MR-01 als PDF uploaden in de documentenbibliotheek</li>
-              <li>Wekelijkse herinnering/mail loopt via de geplande taak</li>
+              <li>{T.q_ar_1}</li><li>{T.q_ar_2}</li><li>{T.q_ar_3}</li><li>{T.q_ar_4}</li>
             </ul>
           </div>
         </div>
       </div>
 
       <div className="card">
-        <h2>Documentenbibliotheek</h2>
-        <p className="muted small" style={{ marginTop: -8 }}>
-          De gezaghebbende documenten (handboek, onderbouwing, audits). Upload de PDF per document.
-        </p>
+        <h2>{T.q_lib}</h2>
+        <p className="muted small" style={{ marginTop: -8 }}>{T.q_lib_sub}</p>
         <table>
           <thead>
-            <tr><th>Document</th><th>Type</th><th>Referentie</th><th>Hoofdstuk</th><th>PDF</th></tr>
+            <tr><th>{T.q_doc}</th><th>{T.q_doctype}</th><th>{T.q_docref}</th><th>{T.q_chapter}</th><th>{T.q_pdf}</th></tr>
           </thead>
           <tbody>
             {docList.length === 0 ? (
-              <tr><td colSpan={5} className="muted small">Nog geen documenten. Voeg ze hieronder toe.</td></tr>
+              <tr><td colSpan={5} className="muted small">{T.q_no_docs}</td></tr>
             ) : docList.map((d) => (
               <tr key={d.id}>
                 <td>{d.title}</td>
@@ -86,12 +74,12 @@ export default async function QualityPage() {
                 <td className="muted small">{d.clause_number ?? "—"}</td>
                 <td>
                   {signed[d.id] ? (
-                    <a className="small" href={signed[d.id]} target="_blank" rel="noreferrer">Download</a>
+                    <a className="small" href={signed[d.id]} target="_blank" rel="noreferrer">{T.q_download}</a>
                   ) : (
                     <form action={uploadDocFile} encType="multipart/form-data" style={{ display: "flex", gap: 6 }}>
                       <input type="hidden" name="document_id" value={d.id} />
                       <input type="file" name="file" accept="application/pdf" className="small" required />
-                      <button className="btn sm" type="submit">Upload</button>
+                      <button className="btn sm" type="submit">{T.q_upload}</button>
                     </form>
                   )}
                 </td>
@@ -101,30 +89,30 @@ export default async function QualityPage() {
         </table>
 
         <details style={{ marginTop: 14 }}>
-          <summary className="small" style={{ cursor: "pointer", color: "var(--sea)" }}>+ Document toevoegen</summary>
+          <summary className="small" style={{ cursor: "pointer", color: "var(--sea)" }}>{T.q_add_doc}</summary>
           <form action={addDocument} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 12, maxWidth: 620 }}>
-            <input name="title" placeholder="Titel" required />
-            <input name="doc_type" placeholder="Type (Procedure/Beleid/Audit/Bewijsstuk)" />
-            <input name="reference" placeholder="Referentie (bv. KH-001 v2.0)" />
-            <input name="clause_number" placeholder="Hoofdstuk (bv. 7, A)" />
-            <button className="btn" type="submit">Opslaan</button>
+            <input name="title" placeholder={T.q_doc} required />
+            <input name="doc_type" placeholder={T.q_doctype} />
+            <input name="reference" placeholder={T.q_docref} />
+            <input name="clause_number" placeholder={T.q_chapter} />
+            <button className="btn" type="submit">{T.save}</button>
           </form>
         </details>
       </div>
 
       <div className="card">
-        <h2>Kwaliteitshandboek per hoofdstuk</h2>
+        <h2>{T.q_handbook}</h2>
         {(clauses as any[] ?? []).map((c) => (
           <div key={c.id} style={{ padding: "14px 0", borderTop: "1px solid var(--line)" }}>
             <strong>{c.clause_number}. {c.title}</strong>
             <p className="small" style={{ margin: "6px 0 0", whiteSpace: "pre-wrap" }}>{c.pbc_approach}</p>
             <details style={{ marginTop: 6 }}>
-              <summary className="small" style={{ cursor: "pointer", color: "var(--sea)" }}>Bewerken</summary>
+              <summary className="small" style={{ cursor: "pointer", color: "var(--sea)" }}>{T.q_editbtn}</summary>
               <form action={updateClause} style={{ marginTop: 8 }}>
                 <input type="hidden" name="clause_id" value={c.id} />
                 <textarea name="pbc_approach" defaultValue={c.pbc_approach ?? ""} rows={5}
                           style={{ width: "100%", fontFamily: "inherit", fontSize: 14, padding: 8, borderRadius: 8, border: "1px solid var(--line)" }} />
-                <button className="btn sm" type="submit" style={{ marginTop: 8 }}>Opslaan</button>
+                <button className="btn sm" type="submit" style={{ marginTop: 8 }}>{T.save}</button>
               </form>
             </details>
           </div>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { progressBadge } from "@/lib/format";
+import { t } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +18,7 @@ interface Row {
 }
 
 export default async function AdminHome() {
+  const T = t();
   const supabase = createClient();
   const { data } = await supabase
     .from("students")
@@ -30,7 +31,6 @@ export default async function AdminHome() {
 
   const students = (data as unknown as Row[]) ?? [];
 
-  // Kerncijfers voor het dashboard
   const [{ count: studentCount }, { count: activeCount }, { count: certCount }, { count: instrCount }] =
     await Promise.all([
       supabase.from("students").select("*", { count: "exact", head: true }),
@@ -40,22 +40,20 @@ export default async function AdminHome() {
     ]);
 
   const kpis = [
-    { label: "Cursisten", value: studentCount ?? 0 },
-    { label: "Actieve inschrijvingen", value: activeCount ?? 0 },
-    { label: "Certificaten", value: certCount ?? 0 },
-    { label: "Instructeurs", value: instrCount ?? 0 },
+    { label: T.ah_kpi_students, value: studentCount ?? 0 },
+    { label: T.ah_kpi_active, value: activeCount ?? 0 },
+    { label: T.ah_kpi_certs, value: certCount ?? 0 },
+    { label: T.ah_kpi_instr, value: instrCount ?? 0 },
   ];
 
   return (
     <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div>
-          <h1 className="page-title">Cursisten</h1>
-          <p className="page-sub">
-            Leerlingadministratie — alle ingeschreven cursisten en hun voortgang.
-          </p>
+          <h1 className="page-title">{T.ah_title}</h1>
+          <p className="page-sub">{T.ah_sub}</p>
         </div>
-        <Link className="btn" href="/admin/students/new">+ Nieuwe cursist</Link>
+        <Link className="btn" href="/admin/students/new">{T.ah_new}</Link>
       </div>
 
       <div className="kpis">
@@ -69,18 +67,12 @@ export default async function AdminHome() {
 
       <div className="card">
         {students.length === 0 ? (
-          <p className="muted small">
-            Nog geen cursisten. Voer <code>seed-demo.sql</code> uit voor demo-data.
-          </p>
+          <p className="muted small">{T.ah_none}</p>
         ) : (
           <table>
             <thead>
               <tr>
-                <th>Cursistnr.</th>
-                <th>Naam</th>
-                <th>Opleiding</th>
-                <th>Voortgang</th>
-                <th></th>
+                <th>{T.ah_num}</th><th>{T.ah_name}</th><th>{T.ah_course}</th><th>{T.ah_progress}</th><th></th>
               </tr>
             </thead>
             <tbody>
@@ -92,25 +84,13 @@ export default async function AdminHome() {
                 return (
                   <tr key={s.id}>
                     <td className="muted small">{s.student_number}</td>
-                    <td>
-                      <Link href={`/admin/students/${s.id}`}>
-                        {s.first_name} {s.last_name}
-                      </Link>
-                    </td>
+                    <td><Link href={`/admin/students/${s.id}`}>{s.first_name} {s.last_name}</Link></td>
                     <td>{enr?.courses?.code ?? "—"}</td>
                     <td style={{ minWidth: 160 }}>
-                      <div className="progress-wrap">
-                        <div className="progress-bar" style={{ width: `${pct}%` }} />
-                      </div>
-                      <span className="muted small">
-                        {done}/{mods.length} modules · {pct}%
-                      </span>
+                      <div className="progress-wrap"><div className="progress-bar" style={{ width: `${pct}%` }} /></div>
+                      <span className="muted small">{done}/{mods.length} {T.ah_modules} · {pct}%</span>
                     </td>
-                    <td>
-                      <Link className="btn ghost sm" href={`/admin/students/${s.id}`}>
-                        Open dossier
-                      </Link>
-                    </td>
+                    <td><Link className="btn ghost sm" href={`/admin/students/${s.id}`}>{T.ah_open}</Link></td>
                   </tr>
                 );
               })}

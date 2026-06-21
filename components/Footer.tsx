@@ -1,10 +1,11 @@
+import { t } from "@/lib/i18n";
+
 export default function Footer() {
+  const T = t();
   return (
     <footer className="footer">
-      <span>Plaza Boat College — Studentdossier</span>
-      <span className="muted">
-        Erkende maritieme opleiding · SCV Code / RVZ Bijlage 6 · v1.0
-      </span>
+      <span>{T.footer_org}</span>
+      <span className="muted">{T.footer_sub}</span>
     </footer>
   );
 }
