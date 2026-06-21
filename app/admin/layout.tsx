@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getProfile } from "@/lib/getProfile";
 import TopBar from "@/components/TopBar";
 import AdminNav from "@/components/AdminNav";
+import QmsReminderBanner from "@/components/QmsReminderBanner";
 import Footer from "@/components/Footer";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -15,6 +16,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <>
       <TopBar name={profile.full_name || profile.email || ""} role={profile.role} />
       <AdminNav />
+      <QmsReminderBanner />
       <div className="container">{children}</div>
       <Footer />
     </>
