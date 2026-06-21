@@ -7,6 +7,7 @@ export default function AdminNav() {
     <nav className="adminnav">
       <Link href="/admin">{T.nav_students}</Link>
       <Link href="/admin/instructors">{T.nav_instructors}</Link>
+      <Link href="/admin/content">{T.iln_content}</Link>
       <Link href="/admin/quality">{T.nav_quality}</Link>
       <Link href="/admin/quality/kpi">{T.nav_kpi}</Link>
       <Link href="/admin/quality/registers">{T.nav_registers}</Link>
