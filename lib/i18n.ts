@@ -238,6 +238,7 @@ const nl = {
     qual_kind_vhf_opt: "VHF-certificaat (SCV Code X/6.1 — Reg 10.11)",
     qual_unlimited: "Onbeperkt", qual_expired: "Verlopen", qual_expires_in: "Verloopt over {n} dg", qual_valid: "Geldig",
     us_create_pw: "Aanmaken met tijdelijk wachtwoord (geen e-mail nodig)", us_create_btn: "Account aanmaken",
+    us_pw_set: "Wachtwoord (leeg = automatisch)",
     us_created: "Account aangemaakt. Geef deze gegevens door aan de persoon:", us_temp_pw: "Tijdelijk wachtwoord",
     us_change_hint: "Vraag de persoon het wachtwoord na de eerste keer inloggen te wijzigen (via Account).",
 } as const;
@@ -460,6 +461,7 @@ const en: Record<Keys, string> = {
     qual_kind_vhf_opt: "VHF certificate (SCV Code X/6.1 — Reg 10.11)",
     qual_unlimited: "Unlimited", qual_expired: "Expired", qual_expires_in: "Expires in {n} days", qual_valid: "Valid",
     us_create_pw: "Create with temporary password (no email needed)", us_create_btn: "Create account",
+    us_pw_set: "Password (empty = automatic)",
     us_created: "Account created. Share these details with the person:", us_temp_pw: "Temporary password",
     us_change_hint: "Ask the person to change the password after first login (via Account).",
 };

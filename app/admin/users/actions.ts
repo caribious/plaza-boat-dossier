@@ -39,9 +39,10 @@ export async function createUserWithPassword(_prev: CreateState, formData: FormD
   const email = String(formData.get("email") || "").trim();
   const full_name = String(formData.get("full_name") || "").trim();
   const role = String(formData.get("role") || "student");
+  const customPw = String(formData.get("password") || "").trim();
   if (!email) return { status: "error", message: "E-mail is verplicht." };
   const admin = createAdminClient();
-  const password = tempPassword();
+  const password = customPw.length >= 6 ? customPw : tempPassword();
   const { data, error } = await admin.auth.admin.createUser({
     email, password, email_confirm: true,
     user_metadata: { full_name, role },

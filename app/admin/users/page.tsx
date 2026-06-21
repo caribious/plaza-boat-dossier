@@ -17,7 +17,8 @@ export default async function UsersPage() {
   const rows = (data as any[]) ?? [];
   const roleLabel = (r: string) => r === "admin" ? T.role_admin : r === "instructor" ? T.role_instructor : r === "auditor" ? T.role_auditor : T.role_student;
   const labels = { name: T.us_name, email: T.us_email, send: T.us_send, sent: T.us_sent,
-    admin: T.role_admin, instructor: T.role_instructor, auditor: T.role_auditor, student: T.role_student };
+    admin: T.role_admin, instructor: T.role_instructor, auditor: T.role_auditor, student: T.role_student,
+    create: T.us_create_btn, created: T.us_created, temp_pw: T.us_temp_pw, change_hint: T.us_change_hint, pw_set: T.us_pw_set };
 
   return (
     <>

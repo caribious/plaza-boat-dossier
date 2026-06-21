@@ -6,9 +6,10 @@ export default function CreateUserPw({ labels }: { labels: Record<string, string
   const [state, formAction] = useFormState(createUserWithPassword, { status: "idle" } as CreateState);
   return (
     <>
-      <form action={formAction} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr auto", gap: 10, alignItems: "center" }}>
+      <form action={formAction} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr auto", gap: 10, alignItems: "center" }}>
         <input name="full_name" placeholder={labels.name} />
         <input name="email" type="email" placeholder={labels.email} required />
+        <input name="password" placeholder={labels.pw_set} />
         <select name="role" defaultValue="admin">
           <option value="admin">{labels.admin}</option>
           <option value="instructor">{labels.instructor}</option>
