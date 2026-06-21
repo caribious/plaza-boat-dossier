@@ -39,6 +39,34 @@ export default async function QualityPage() {
       </p>
 
       <div className="card">
+        <h2>Zo werkt het</h2>
+        <p className="muted small" style={{ marginTop: -8 }}>
+          De app is je dashboard, register en herinneringssysteem. Documenten opstellen en
+          ondertekenen gebeurt eromheen; de getekende PDF&apos;s upload je hier als bewijs.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div>
+            <span className="flabel">In de app</span>
+            <ul className="small" style={{ margin: "6px 0 0", paddingLeft: 18 }}>
+              <li>Registreren: <Link href="/admin/quality/registers">incidenten, klachten, CAPA, risico&apos;s</Link></li>
+              <li>Herinneringen op de <Link href="/admin/quality/agenda">QMS-agenda</Link></li>
+              <li>Audit &amp; directiebeoordeling plannen en afvinken bij <Link href="/admin/quality/reviews">Audit &amp; beoordeling</Link></li>
+              <li>Certificaten en documenten uploaden (hieronder en bij Instructeurs)</li>
+            </ul>
+          </div>
+          <div>
+            <span className="flabel">Eromheen (daarna hier uploaden)</span>
+            <ul className="small" style={{ margin: "6px 0 0", paddingLeft: 18 }}>
+              <li>Handboek, procedures (PR-01 t/m PR-09) en formulieren opstellen/ondertekenen</li>
+              <li>De interne audit en de directiebeoordeling daadwerkelijk houden</li>
+              <li>Getekende IA-01 / MR-01 als PDF uploaden in de documentenbibliotheek</li>
+              <li>Wekelijkse herinnering/mail loopt via de geplande taak</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div className="card">
         <h2>Documentenbibliotheek</h2>
         <p className="muted small" style={{ marginTop: -8 }}>
           De gezaghebbende documenten (handboek, onderbouwing, audits). Upload de PDF per document.
