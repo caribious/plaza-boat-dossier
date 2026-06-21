@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { t } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
 export default async function IltHome() {
+  const T = t();
   const supabase = createClient();
   const [students, enrollments, certs, instructors, exams, audit] = await Promise.all([
     supabase.from("students").select("*", { count: "exact", head: true }),
@@ -15,21 +17,18 @@ export default async function IltHome() {
   ]);
 
   const kpis = [
-    { label: "Cursisten", value: students.count ?? 0 },
-    { label: "Actieve inschrijvingen", value: enrollments.count ?? 0 },
-    { label: "Examenregistraties", value: exams.count ?? 0 },
-    { label: "Certificaten", value: certs.count ?? 0 },
-    { label: "Instructeurs", value: instructors.count ?? 0 },
-    { label: "Audit-regels", value: audit.count ?? 0 },
+    { label: T.nav_students, value: students.count ?? 0 },
+    { label: T.ah_kpi_active, value: enrollments.count ?? 0 },
+    { label: T.ilh_kpi_exams, value: exams.count ?? 0 },
+    { label: T.ah_kpi_certs, value: certs.count ?? 0 },
+    { label: T.nav_instructors, value: instructors.count ?? 0 },
+    { label: T.ilh_kpi_audit, value: audit.count ?? 0 },
   ];
 
   return (
     <>
-      <h1 className="page-title">ILT-inzage — overzicht</h1>
-      <p className="page-sub">
-        Volledig, alleen-lezen beeld van Plaza Boat College. Niets kan vanuit deze
-        omgeving gewijzigd worden.
-      </p>
+      <h1 className="page-title">{T.ilh_title}</h1>
+      <p className="page-sub">{T.ilh_sub}</p>
 
       <div className="kpis" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
         {kpis.map((k) => (
@@ -41,13 +40,13 @@ export default async function IltHome() {
       </div>
 
       <div className="card">
-        <h2>Wat u hier kunt inzien</h2>
+        <h2>{T.ilh_can_view}</h2>
         <ul style={{ margin: 0, paddingLeft: 18, lineHeight: 1.9 }}>
-          <li><Link href="/ilt/students">Cursisten</Link> — volledige dossiers: voortgang, uren, examens (met examinator) en certificaten.</li>
-          <li><Link href="/ilt/instructors">Instructeurs</Link> — kwalificaties met certificaatnummer en geldigheid.</li>
-          <li><Link href="/ilt/content">Lesprogramma</Link> — opleidingen BM I/II/III en de modulestructuur.</li>
-          <li><Link href="/ilt/audit">Audit-log</Link> — onveranderbaar spoor van alle wijzigingen.</li>
-          <li><Link href="/ilt/export">Inspectierapport</Link> — alles gebundeld in één afdrukbaar/PDF-document.</li>
+          <li><Link href="/ilt/students">{T.nav_students}</Link>{T.ilh_li_students}</li>
+          <li><Link href="/ilt/instructors">{T.nav_instructors}</Link>{T.ilh_li_instructors}</li>
+          <li><Link href="/ilt/content">{T.iln_content}</Link>{T.ilh_li_content}</li>
+          <li><Link href="/ilt/audit">{T.iln_audit}</Link>{T.ilh_li_audit}</li>
+          <li><Link href="/ilt/export">{T.iln_export}</Link>{T.ilh_li_export}</li>
         </ul>
       </div>
     </>
