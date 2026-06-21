@@ -153,6 +153,12 @@ const nl = {
     rv_you_signed: "U heeft dit ondertekend", rv_signatures: "Ondertekening",
     rv_no_sign: "Nog niet ondertekend", rv_sign_after: "Eerst afronden, dan ondertekenen",
     rv_sign_note: "Geauthenticeerde ondertekening (ingelogde gebruiker + rol + datum/tijd), onveranderbaar vastgelegd.",
+    nav_satisfaction: "Tevredenheid",
+    sat_title: "Cursisttevredenheid", sat_sub: "Resultaten van tevredenheidsmetingen per cursus (ISO 9001 §9.1.2 · doelstelling D5: gemiddeld ≥ 4,2).",
+    sat_add: "+ Meting toevoegen", sat_period: "Periode / cursus", sat_surveydate: "Datum meting",
+    sat_respondents: "Respondenten", sat_avg: "Gem. score", sat_comments: "Opmerkingen",
+    sat_none: "Nog geen metingen vastgelegd.", sat_overall: "Gemiddelde (alle metingen)",
+    sat_target: "Streefwaarde D5", sat_score_ph: "Gem. score (1,0–5,0)", sat_readonly: "Tevredenheidsmetingen (alleen-lezen).",
 } as const;
 
 type Keys = keyof typeof nl;
@@ -291,6 +297,12 @@ const en: Record<Keys, string> = {
     rv_you_signed: "You have signed this", rv_signatures: "Signatures",
     rv_no_sign: "Not signed yet", rv_sign_after: "Complete first, then sign",
     rv_sign_note: "Authenticated sign-off (logged-in user + role + date/time), recorded immutably.",
+    nav_satisfaction: "Satisfaction",
+    sat_title: "Student satisfaction", sat_sub: "Results of satisfaction surveys per course (ISO 9001 §9.1.2 · objective D5: average ≥ 4.2).",
+    sat_add: "+ Add survey", sat_period: "Period / course", sat_surveydate: "Survey date",
+    sat_respondents: "Respondents", sat_avg: "Avg. score", sat_comments: "Comments",
+    sat_none: "No surveys recorded yet.", sat_overall: "Average (all surveys)",
+    sat_target: "Target D5", sat_score_ph: "Avg. score (1.0–5.0)", sat_readonly: "Satisfaction surveys (read-only).",
 };
 
 const DICT = { nl, en };
