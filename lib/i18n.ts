@@ -149,6 +149,10 @@ const nl = {
     ac_back: "← Terug", ac_title: "Mijn account", ac_sub: "Beheer je inloggegevens.",
     ac_data: "Gegevens", ac_name: "Naam", ac_email: "E-mail", ac_role: "Rol",
     ac_pw: "Wachtwoord wijzigen", ac_pw_hint: "Wijzig je tijdelijke wachtwoord direct na de eerste keer inloggen.",
+    rv_signoff: "Vaststellen & ondertekenen", rv_signed_by: "Ondertekend door",
+    rv_you_signed: "U heeft dit ondertekend", rv_signatures: "Ondertekening",
+    rv_no_sign: "Nog niet ondertekend", rv_sign_after: "Eerst afronden, dan ondertekenen",
+    rv_sign_note: "Geauthenticeerde ondertekening (ingelogde gebruiker + rol + datum/tijd), onveranderbaar vastgelegd.",
 } as const;
 
 type Keys = keyof typeof nl;
@@ -283,6 +287,10 @@ const en: Record<Keys, string> = {
     ac_back: "← Back", ac_title: "My account", ac_sub: "Manage your login details.",
     ac_data: "Details", ac_name: "Name", ac_email: "Email", ac_role: "Role",
     ac_pw: "Change password", ac_pw_hint: "Change your temporary password right after your first login.",
+    rv_signoff: "Approve & sign", rv_signed_by: "Signed by",
+    rv_you_signed: "You have signed this", rv_signatures: "Signatures",
+    rv_no_sign: "Not signed yet", rv_sign_after: "Complete first, then sign",
+    rv_sign_note: "Authenticated sign-off (logged-in user + role + date/time), recorded immutably.",
 };
 
 const DICT = { nl, en };

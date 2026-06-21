@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { fmtDate } from "@/lib/format";
 import { t } from "@/lib/i18n";
-import { saveReview, completeReview } from "./actions";
+import { saveReview, completeReview, signReview } from "./actions";
 
 export const dynamic = "force-dynamic";
 const td = new Date().toISOString().slice(0, 10);
@@ -16,11 +16,19 @@ export default async function ReviewsPage() {
     : { cls: "idle", label: T.rv_planned };
 
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
   const { data } = await supabase
     .from("qms_reviews")
     .select("id, ref, kind, planned_date, completed_date, scope, summary, owner, status")
     .order("planned_date", { ascending: false });
   const rows = (data as any[]) ?? [];
+
+  const { data: sigData } = await supabase
+    .from("qms_review_signatures")
+    .select("review_id, signer_profile_id, signer_name, signer_role, signed_at");
+  const sigs = (sigData as any[]) ?? [];
+  const sigsFor = (rid: string) => sigs.filter((s) => s.review_id === rid);
+  const iSigned = (rid: string) => sigs.some((s) => s.review_id === rid && s.signer_profile_id === user?.id);
 
   return (
     <>
@@ -47,13 +55,14 @@ export default async function ReviewsPage() {
         <h2>{T.rv_rounds}</h2>
         <table>
           <thead>
-            <tr><th>{T.ref}</th><th>{T.rv_col_type}</th><th>{T.rv_col_planned}</th><th>{T.rv_col_done}</th><th>{T.owner}</th><th>{T.status}</th><th></th></tr>
+            <tr><th>{T.ref}</th><th>{T.rv_col_type}</th><th>{T.rv_col_planned}</th><th>{T.rv_col_done}</th><th>{T.status}</th><th>{T.rv_signatures}</th><th></th></tr>
           </thead>
           <tbody>
             {rows.length === 0 ? (
               <tr><td colSpan={7} className="muted small">{T.rv_none}</td></tr>
             ) : rows.map((r) => {
               const st = statusBadge(r.status);
+              const mySigs = sigsFor(r.id);
               return (
                 <tr key={r.id}>
                   <td className="muted small">{r.ref ?? "—"}</td>
@@ -61,8 +70,17 @@ export default async function ReviewsPage() {
                     {r.summary ? <div className="muted small" style={{ marginTop: 4 }}>{T.rv_concl}: {r.summary}</div> : null}</td>
                   <td className="muted small">{fmtDate(r.planned_date)}</td>
                   <td className="muted small">{fmtDate(r.completed_date)}</td>
-                  <td className="muted small">{r.owner ?? "—"}</td>
                   <td><span className={`badge ${st.cls}`}>{st.label}</span></td>
+                  <td className="small">
+                    {mySigs.length === 0 ? <span className="muted small">{T.rv_no_sign}</span> :
+                      mySigs.map((s, i) => (
+                        <div key={i} style={{ marginBottom: 4 }}>
+                          <span className="badge ok">✓</span> {s.signer_name}
+                          {s.signer_role ? <span className="muted"> · {s.signer_role}</span> : null}
+                          <span className="muted"> · {fmtDate(s.signed_at)}</span>
+                        </div>
+                      ))}
+                  </td>
                   <td>
                     {r.status !== "afgerond" ? (
                       <details>
@@ -75,13 +93,21 @@ export default async function ReviewsPage() {
                           <button className="btn sm" type="submit">{T.rv_markdone}</button>
                         </form>
                       </details>
-                    ) : <span className="muted small">—</span>}
+                    ) : iSigned(r.id) ? (
+                      <span className="badge ok">{T.rv_you_signed}</span>
+                    ) : (
+                      <form action={signReview}>
+                        <input type="hidden" name="review_id" value={r.id} />
+                        <button className="btn sm" type="submit">{T.rv_signoff}</button>
+                      </form>
+                    )}
                   </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
+        <p className="small muted" style={{ marginTop: 10 }}>{T.rv_sign_note}</p>
       </div>
     </>
   );

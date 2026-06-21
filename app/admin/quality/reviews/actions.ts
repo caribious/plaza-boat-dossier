@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { getProfile } from "@/lib/getProfile";
 
 function nn(v: FormDataEntryValue | null): string | null {
   const s = String(v ?? "").trim();
@@ -56,6 +57,26 @@ export async function completeReview(formData: FormData) {
       status: "afgerond",
     })
     .eq("id", id);
+  revalidatePath("/admin/quality/reviews");
+  revalidatePath("/admin/quality/agenda");
+}
+
+// Geauthenticeerde ondertekening: legt vast wie (ingelogd) heeft vastgesteld.
+export async function signReview(formData: FormData) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  const profile = await getProfile();
+  const role = profile?.role === "admin" ? "Principal / Directie"
+    : profile?.role === "instructor" ? "Instructeur / Chief Instructor"
+    : (profile?.role ?? "");
+  await supabase.from("qms_review_signatures").insert({
+    review_id: String(formData.get("review_id")),
+    signer_profile_id: user.id,
+    signer_name: profile?.full_name || profile?.email || "",
+    signer_role: role,
+    statement: "Vastgesteld en ondertekend",
+  });
   revalidatePath("/admin/quality/reviews");
   revalidatePath("/admin/quality/agenda");
 }
