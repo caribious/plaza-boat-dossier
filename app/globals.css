@@ -29,7 +29,11 @@ a:hover { text-decoration: underline; }
 .topbar {
   background: var(--navy);
   color: #fff;
-  padding: 14px max(24px, calc((100% - 1000px) / 2 + 24px));
+  padding: 14px 24px;
+}
+.topbar-inner {
+  max-width: 1000px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -49,7 +53,10 @@ a:hover { text-decoration: underline; }
 .topbar button.link:hover { background: rgba(255,255,255,.12); }
 
 .adminnav {
-  background: var(--navy-2); padding: 0 max(24px, calc((100% - 1000px) / 2 + 24px)); display: flex; gap: 4px;
+  background: var(--navy-2); padding: 0 24px;
+}
+.adminnav .navrow {
+  max-width: 1000px; margin: 0 auto; display: flex; gap: 4px; overflow-x: auto;
 }
 .adminnav a {
   color: #cdd9e5; padding: 11px 16px; font-size: 14px; font-weight: 600;
