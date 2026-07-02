@@ -1,5 +1,6 @@
 "use server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { resendConfigured, sendInviteEmail } from "@/lib/email";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 
@@ -18,6 +19,24 @@ export async function inviteUser(_prev: InviteState, formData: FormData): Promis
   const redirectTo = origin ? `${origin}/auth/callback?next=/reset-password` : undefined;
 
   const admin = createAdminClient();
+
+  // Met Resend: zelf de activatielink genereren en via onze eigen mailer sturen.
+  if (resendConfigured()) {
+    const { data, error } = await admin.auth.admin.generateLink({
+      type: "invite",
+      email,
+      options: { data: { full_name, role }, redirectTo },
+    });
+    if (error) return { status: "error", message: error.message };
+    const link = data.properties?.action_link;
+    if (!link) return { status: "error", message: "Kon geen activatielink genereren." };
+    const sent = await sendInviteEmail(email, full_name, link, role);
+    if (!sent.ok) return { status: "error", message: `Versturen mislukt (${sent.error}).` };
+    revalidatePath("/admin/users");
+    return { status: "ok", email };
+  }
+
+  // Terugval: Supabase's ingebouwde mailer (vereist SMTP in Supabase Auth).
   const { error } = await admin.auth.admin.inviteUserByEmail(email, {
     data: { full_name, role },
     redirectTo,

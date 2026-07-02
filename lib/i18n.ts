@@ -169,7 +169,7 @@ const nl = {
     us_invite: "Gebruiker uitnodigen", us_name: "Volledige naam", us_email: "E-mail", us_role: "Rol",
     us_send: "Uitnodiging sturen", us_sent: "Uitnodiging verstuurd naar", us_existing: "Bestaande accounts",
     us_admin_only: "Deze pagina is alleen voor beheerders.", us_none: "Nog geen accounts.",
-    us_note: "Werkt zodra e-mail (SMTP) is ingesteld in Supabase Authentication en de site-URL is toegestaan.",
+    us_note: "De uitnodiging wordt via Resend verstuurd zodra RESEND_API_KEY is ingesteld; anders valt het systeem terug op Supabase-mail.",
     // KPI-dashboard (§6.2 / §9.1)
     kpi_title: "KPI-dashboard — ISO 9001",
     kpi_sub: "Live kwaliteitsprestatie-indicatoren, berekend uit de operationele data (toetsen, registers, inschrijvingen). Status groen/oranje/rood t.o.v. de kwaliteitsdoelstellingen (§6.2, §9.1).",
@@ -425,7 +425,7 @@ const en: Record<Keys, string> = {
     us_invite: "Invite user", us_name: "Full name", us_email: "Email", us_role: "Role",
     us_send: "Send invite", us_sent: "Invite sent to", us_existing: "Existing accounts",
     us_admin_only: "This page is for admins only.", us_none: "No accounts yet.",
-    us_note: "Works once email (SMTP) is configured in Supabase Authentication and the site URL is allowed.",
+    us_note: "The invite is sent via Resend once RESEND_API_KEY is set; otherwise it falls back to Supabase email.",
     kpi_title: "KPI dashboard — ISO 9001",
     kpi_sub: "Live quality performance indicators, calculated from the operational data (tests, registers, enrolments). Status green/orange/red against the quality objectives (§6.2, §9.1).",
     kpi_to_handbook: "→ Quality manual", kpi_to_registers: "QMS registers", kpi_to_risks: "Risk register",
