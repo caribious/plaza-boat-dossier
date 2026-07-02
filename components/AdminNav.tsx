@@ -10,13 +10,18 @@ export default function AdminNav() {
         <Link href="/admin/instructors">{T.nav_instructors}</Link>
         <Link href="/admin/content">{T.iln_content}</Link>
         <Link href="/admin/exams">{T.nav_exams}</Link>
-        <Link href="/admin/quality">{T.nav_quality}</Link>
-        <Link href="/admin/quality/kpi">{T.nav_kpi}</Link>
-        <Link href="/admin/quality/registers">{T.nav_registers}</Link>
-        <Link href="/admin/quality/registers/risks">{T.nav_risks}</Link>
-        <Link href="/admin/quality/agenda">{T.nav_agenda}</Link>
-        <Link href="/admin/quality/reviews">{T.nav_reviews}</Link>
-        <Link href="/admin/quality/satisfaction">{T.nav_satisfaction}</Link>
+        <div className="navgroup">
+          <Link href="/admin/quality">{T.nav_quality} ▾</Link>
+          <div className="navdrop">
+            <Link href="/admin/quality">{T.nav_quality}</Link>
+            <Link href="/admin/quality/kpi">{T.nav_kpi}</Link>
+            <Link href="/admin/quality/registers">{T.nav_registers}</Link>
+            <Link href="/admin/quality/registers/risks">{T.nav_risks}</Link>
+            <Link href="/admin/quality/agenda">{T.nav_agenda}</Link>
+            <Link href="/admin/quality/reviews">{T.nav_reviews}</Link>
+            <Link href="/admin/quality/satisfaction">{T.nav_satisfaction}</Link>
+          </div>
+        </div>
         <Link href="/admin/ilt-aanvraag">ILT-aanvraag</Link>
         <Link href="/admin/users">{T.nav_users}</Link>
       </div>
