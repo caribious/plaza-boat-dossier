@@ -44,33 +44,50 @@ export async function createStudent(formData: FormData) {
     throw new Error("Aanmaken cursist mislukt: " + (error?.message ?? ""));
   }
 
-  // Optioneel direct inschrijven op een opleiding + modulevoortgang aanmaken
+  // Optioneel direct inschrijven op een opleiding + modulevoortgang aanmaken.
+  // Cascade: een hogere graad omvat de lagere. BM-I → I+II+III, BM-II → II+III, BM-III → III.
   const courseId = String(formData.get("course_id") || "");
   if (courseId) {
-    const { data: enrollment } = await supabase
-      .from("enrollments")
-      .insert({
-        student_id: student.id,
-        course_id: courseId,
-        status: "enrolled",
-        start_date: new Date().toISOString().slice(0, 10),
-      })
-      .select("id")
-      .single();
+    const CASCADE: Record<string, string[]> = {
+      "BM-III": ["BM-III"],
+      "BM-II": ["BM-III", "BM-II"],
+      "BM-I": ["BM-III", "BM-II", "BM-I"],
+    };
+    const { data: allCourses } = await supabase.from("courses").select("id, code");
+    const codeById = new Map((allCourses ?? []).map((c: any) => [c.id, c.code]));
+    const idByCode = new Map((allCourses ?? []).map((c: any) => [c.code, c.id]));
+    const chosenCode = codeById.get(courseId);
+    // Lagere graden eerst aanmaken, gekozen (hoogste) graad als laatste → die is de "primaire" inschrijving.
+    const codes = (chosenCode && CASCADE[chosenCode]) || (chosenCode ? [chosenCode] : []);
 
-    if (enrollment) {
-      const { data: modules } = await supabase
-        .from("modules")
+    for (const code of codes) {
+      const cid = idByCode.get(code);
+      if (!cid) continue;
+      const { data: enrollment } = await supabase
+        .from("enrollments")
+        .insert({
+          student_id: student.id,
+          course_id: cid,
+          status: "enrolled",
+          start_date: new Date().toISOString().slice(0, 10),
+        })
         .select("id")
-        .eq("course_id", courseId);
-      if (modules && modules.length) {
-        await supabase.from("module_progress").insert(
-          modules.map((m: any) => ({
-            enrollment_id: enrollment.id,
-            module_id: m.id,
-            status: "not_started",
-          }))
-        );
+        .single();
+
+      if (enrollment) {
+        const { data: modules } = await supabase
+          .from("modules")
+          .select("id")
+          .eq("course_id", cid);
+        if (modules && modules.length) {
+          await supabase.from("module_progress").insert(
+            modules.map((m: any) => ({
+              enrollment_id: enrollment.id,
+              module_id: m.id,
+              status: "not_started",
+            }))
+          );
+        }
       }
     }
   }

@@ -91,8 +91,9 @@ export default async function NewStudent() {
             ))}
           </select>
           <p className="muted small">
-            Bij het kiezen van een opleiding worden de bijbehorende modules automatisch
-            klaargezet op "nog niet gestart".
+            Een hogere graad omvat de lagere: bij <strong>BM-I</strong> wordt de cursist ook
+            op BM-II en BM-III ingeschreven, bij <strong>BM-II</strong> ook op BM-III. De
+            bijbehorende modules worden per graad klaargezet op "nog niet gestart".
           </p>
 
           <label className="flabel" style={{ display: "block", marginTop: 16 }}>
