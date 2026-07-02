@@ -34,15 +34,6 @@ export default async function IltAanvraag() {
     .order("component_no");
   const folders = (data as IltFolder[]) ?? [];
 
-  // Signed download-links (1 uur geldig)
-  const signed: Record<string, string> = {};
-  for (const f of folders) {
-    for (const d of f.ilt_files ?? []) {
-      const { data: s } = await supabase.storage.from("ilt-dossier").createSignedUrl(d.file_path, 3600);
-      if (s?.signedUrl) signed[d.id] = s.signedUrl;
-    }
-  }
-
   return (
     <>
       <h1 className="page-title">ILT-aanvraag — erkenning maritieme opleiding</h1>
@@ -89,11 +80,7 @@ export default async function IltAanvraag() {
                           <ul style={{ margin: 0, paddingLeft: 18 }}>
                             {docs.map((d) => (
                               <li key={d.id} className="small">
-                                {signed[d.id] ? (
-                                  <a href={signed[d.id]} target="_blank" rel="noreferrer">{d.file_name}</a>
-                                ) : (
-                                  d.file_name
-                                )}{" "}
+                                <a href={`/admin/ilt-aanvraag/download/${d.id}`} target="_blank" rel="noreferrer">{d.file_name}</a>{" "}
                                 <span className="muted">({fmtDate(d.created_at)})</span>{" "}
                                 <form action={deleteIltFile} style={{ display: "inline" }}>
                                   <input type="hidden" name="file_id" value={d.id} />
