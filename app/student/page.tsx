@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { progressBadge, examBadge, examKindLabel, fmtDate, qualificationKindLabel, expiryBadge } from "@/lib/format";
 import { t } from "@/lib/i18n";
+import { updateOwnDetails } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -81,6 +82,59 @@ export default async function StudentPortal() {
           <div className="progress-bar" style={{ width: `${pct}%` }} />
         </div>
         <p className="muted small">{done} {T.sp_done_of} {mods.length} {T.sp_modules_done} ({pct}%).</p>
+      </div>
+
+      <div className="card">
+        <h2>{T.sp_mydata}</h2>
+        <dl className="kv">
+          <dt>{T.sp_fn}</dt><dd>{student.first_name}</dd>
+          <dt>{T.sp_ln}</dt><dd>{student.last_name}</dd>
+          <dt>{T.sp_dob}</dt><dd>{fmtDate(student.date_of_birth)}</dd>
+          <dt>{T.sp_email}</dt><dd>{student.email ?? "—"}</dd>
+          <dt>{T.sp_phone}</dt><dd>{student.phone ?? "—"}</dd>
+          <dt>{T.sp_addr}</dt><dd>{student.address ?? "—"}</dd>
+        </dl>
+        <details style={{ marginTop: 10 }}>
+          <summary className="small" style={{ cursor: "pointer", color: "var(--sea)" }}>{T.sp_mydata_edit}</summary>
+          <p className="muted small" style={{ marginTop: 8 }}>{T.sp_mydata_hint}</p>
+          <form action={updateOwnDetails} style={{ marginTop: 8, display: "grid", gap: 8 }}>
+            <div className="grid-2">
+              <div>
+                <label className="flabel">{T.sp_fn}</label>
+                <input name="first_name" defaultValue={student.first_name} required style={{ width: "100%" }} />
+              </div>
+              <div>
+                <label className="flabel">{T.sp_ln}</label>
+                <input name="last_name" defaultValue={student.last_name} required style={{ width: "100%" }} />
+              </div>
+              <div>
+                <label className="flabel">{T.sp_dob}</label>
+                <input name="date_of_birth" type="date" defaultValue={student.date_of_birth ?? ""} style={{ width: "100%" }} />
+              </div>
+              <div>
+                <label className="flabel">{T.sp_pob}</label>
+                <input name="place_of_birth" defaultValue={student.place_of_birth ?? ""} style={{ width: "100%" }} />
+              </div>
+              <div>
+                <label className="flabel">{T.sp_email}</label>
+                <input name="email" type="email" defaultValue={student.email ?? ""} style={{ width: "100%" }} />
+              </div>
+              <div>
+                <label className="flabel">{T.sp_phone}</label>
+                <input name="phone" defaultValue={student.phone ?? ""} style={{ width: "100%" }} />
+              </div>
+              <div>
+                <label className="flabel">{T.sp_nat}</label>
+                <input name="nationality" defaultValue={student.nationality ?? ""} style={{ width: "100%" }} />
+              </div>
+              <div>
+                <label className="flabel">{T.sp_addr}</label>
+                <input name="address" defaultValue={student.address ?? ""} style={{ width: "100%" }} />
+              </div>
+            </div>
+            <button className="btn sm" type="submit" style={{ justifySelf: "start" }}>{T.sp_save}</button>
+          </form>
+        </details>
       </div>
 
       <div className="card">
