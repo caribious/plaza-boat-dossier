@@ -8,8 +8,17 @@ import CreateLogin from "@/components/CreateLogin";
 
 export const dynamic = "force-dynamic";
 
-export default async function StudentDossier({ params }: { params: { id: string } }) {
+export default async function StudentDossier({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams: { invite?: string };
+}) {
   const supabase = createClient();
+  const inviteParam = searchParams?.invite ?? "";
+  const inviteOk = inviteParam === "ok";
+  const inviteErr = inviteParam.startsWith("fail:") ? inviteParam.slice(5) : "";
   const QUALIFICATION_KINDS = qualificationKinds();
 
   const { data: student } = await supabase
@@ -97,6 +106,18 @@ export default async function StudentDossier({ params }: { params: { id: string 
       <p className="small">
         <Link href="/admin">← Terug naar cursisten</Link>
       </p>
+      {inviteOk && (
+        <div className="card" style={{ borderLeft: "4px solid var(--ok)", marginBottom: 14 }}>
+          <span className="badge ok">Uitnodiging verstuurd</span>{" "}
+          <span className="small">De cursist heeft een e-mail ontvangen om het account te activeren.</span>
+        </div>
+      )}
+      {inviteErr && (
+        <div className="card" style={{ borderLeft: "4px solid #b3261e", marginBottom: 14 }}>
+          <span className="badge bad">Uitnodiging niet verstuurd</span>{" "}
+          <span className="small">Cursist is wél aangemaakt. Reden: {inviteErr} — je kunt hieronder alsnog een inlog aanmaken.</span>
+        </div>
+      )}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
         <div>
           <h1 className="page-title">

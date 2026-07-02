@@ -94,6 +94,16 @@ export default async function NewStudent() {
             Bij het kiezen van een opleiding worden de bijbehorende modules automatisch
             klaargezet op "nog niet gestart".
           </p>
+
+          <label className="flabel" style={{ display: "block", marginTop: 16 }}>
+            <input type="checkbox" name="send_invite" style={{ width: "auto", marginRight: 8 }} />
+            Stuur direct een e-mailuitnodiging naar het opgegeven e-mailadres
+          </label>
+          <p className="muted small">
+            De cursist krijgt een activatiemail (via Resend) en stelt zelf een wachtwoord in;
+            de inlog wordt meteen aan dit dossier gekoppeld. Vereist dat je hierboven een
+            e-mailadres invult.
+          </p>
         </div>
 
         <button className="btn" type="submit">Cursist aanmaken</button>

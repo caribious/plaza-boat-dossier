@@ -1,6 +1,9 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { sendInviteEmail } from "@/lib/email";
+import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -14,15 +17,19 @@ export async function createStudent(formData: FormData) {
   const year = new Date().getFullYear();
   const studentNumber = `PBC-${year}-${String((count ?? 0) + 1).padStart(4, "0")}`;
 
+  const firstName = String(formData.get("first_name"));
+  const lastName = String(formData.get("last_name"));
+  const email = String(formData.get("email") || "").trim();
+
   const { data: student, error } = await supabase
     .from("students")
     .insert({
       student_number: studentNumber,
-      first_name: String(formData.get("first_name")),
-      last_name: String(formData.get("last_name")),
+      first_name: firstName,
+      last_name: lastName,
       date_of_birth: String(formData.get("date_of_birth")),
       place_of_birth: String(formData.get("place_of_birth") || "") || null,
-      email: String(formData.get("email") || "") || null,
+      email: email || null,
       phone: String(formData.get("phone") || "") || null,
       nationality: String(formData.get("nationality") || "") || null,
       address: String(formData.get("address") || "") || null,
@@ -68,6 +75,43 @@ export async function createStudent(formData: FormData) {
     }
   }
 
+  // Optioneel: direct een e-mailuitnodiging sturen en de inlog aan dit dossier koppelen.
+  let invite = "";
+  if (formData.get("send_invite") === "on") {
+    if (!email) {
+      invite = "fail:Vul een e-mailadres in om te kunnen uitnodigen.";
+    } else {
+      const admin = createAdminClient();
+      const h = headers();
+      const proto = h.get("x-forwarded-proto") ?? "https";
+      const host = h.get("host");
+      const origin = host ? `${proto}://${host}` : "";
+      const redirectTo = origin ? `${origin}/auth/callback?next=/reset-password` : undefined;
+      const fullName = `${firstName} ${lastName}`.trim();
+
+      const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
+        type: "invite",
+        email,
+        options: { data: { full_name: fullName, role: "student" }, redirectTo },
+      });
+      if (linkErr) {
+        invite = "fail:" + linkErr.message;
+      } else {
+        const userId = linkData.user?.id;
+        if (userId) {
+          await admin.from("students").update({ profile_id: userId }).eq("id", student.id);
+        }
+        const link = linkData.properties?.action_link;
+        if (!link) {
+          invite = "fail:Kon geen activatielink genereren.";
+        } else {
+          const sent = await sendInviteEmail(email, fullName, link, "student");
+          invite = sent.ok ? "ok" : "fail:" + sent.error;
+        }
+      }
+    }
+  }
+
   revalidatePath("/admin");
-  redirect(`/admin/students/${student.id}`);
+  redirect(`/admin/students/${student.id}${invite ? `?invite=${encodeURIComponent(invite)}` : ""}`);
 }
