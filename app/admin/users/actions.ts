@@ -16,7 +16,9 @@ export async function inviteUser(_prev: InviteState, formData: FormData): Promis
   const proto = h.get("x-forwarded-proto") ?? "https";
   const host = h.get("host");
   const origin = host ? `${proto}://${host}` : "";
-  const redirectTo = origin ? `${origin}/auth/callback?next=/reset-password` : undefined;
+  // Uitnodigings-/herstellinks leveren de sessie als hash-fragment (implicit flow);
+  // die verwerkt de client op /reset-password (detectSessionInUrl), niet de server-callback.
+  const redirectTo = origin ? `${origin}/reset-password` : undefined;
 
   const admin = createAdminClient();
 

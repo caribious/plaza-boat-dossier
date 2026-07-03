@@ -17,10 +17,23 @@ export default function ResetPassword() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getSession().then(({ data }) => {
+    async function init() {
+      // Uitnodigings-/herstellinks leveren de sessie als hash-fragment
+      // (#access_token=…&refresh_token=…). Die zetten we hier expliciet.
+      if (typeof window !== "undefined" && window.location.hash.includes("access_token")) {
+        const p = new URLSearchParams(window.location.hash.slice(1));
+        const access_token = p.get("access_token");
+        const refresh_token = p.get("refresh_token");
+        if (access_token && refresh_token) {
+          await supabase.auth.setSession({ access_token, refresh_token });
+          history.replaceState(null, "", window.location.pathname);
+        }
+      }
+      const { data } = await supabase.auth.getSession();
       setHasSession(!!data.session);
       setReady(true);
-    });
+    }
+    init();
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {

@@ -103,7 +103,9 @@ export async function createStudent(formData: FormData) {
       const proto = h.get("x-forwarded-proto") ?? "https";
       const host = h.get("host");
       const origin = host ? `${proto}://${host}` : "";
-      const redirectTo = origin ? `${origin}/auth/callback?next=/reset-password` : undefined;
+      // Uitnodigingslink levert de sessie als hash-fragment (implicit flow);
+      // die verwerkt de client op /reset-password, niet de server-callback.
+      const redirectTo = origin ? `${origin}/reset-password` : undefined;
       const fullName = `${firstName} ${lastName}`.trim();
 
       const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
